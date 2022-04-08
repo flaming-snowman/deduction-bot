@@ -3,3 +3,5 @@ node_modules
 config.json
 commands/*.js
 commands/*.js.map
+classes/*.js
+classes/*.js.map
