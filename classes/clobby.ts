@@ -1,25 +1,42 @@
 class Lobby {
     // uids for each user in the lobby
-    mem: Set<bigint>; // list of members
-    time: number;
-    started: boolean;
-    private id: number;
+    private _mem: Set<bigint>; // list of members
+    private _time: number;
+    private _started: boolean;
+    private _id: number;
+
     constructor(num: number, host: bigint) {
-        this.mem = new Set<bigint>();
-        this.mem.add(host);
-        this.id = num;
-        this.time = Math.floor(Date.now()/1000);
-        this.started = false;
+        this._mem = new Set<bigint>();
+        this._mem.add(host);
+        this._id = num;
+        this._time = Math.floor(Date.now()/1000);
+        this._started = false;
+    }
+
+    public get mem(): Set<bigint> {
+        return this._mem;
+    }
+
+    public get time(): number {
+        return this._time;
+    }
+
+    public get started(): boolean {
+        return this._started;
+    }
+
+    public get id(): number {
+        return this._id;
     }
 
     desc(): string {
-        return `Lobby ${this.id} created <t:${this.time}:R> has ${this.mem.size} members with host <@${this.mem.values().next().value}>.`;
+        return `Lobby ${this._id} created <t:${this._time}:R> has ${this._mem.size} members with host <@${this._mem.values().next().value}>.`;
     }
 }
 
 class guildLobby {
     // map of id: lobbies
-    lobbies: Map<number, Lobby>;
+    private lobbies: Map<number, Lobby>;
     private nextID: number; // used to allocate new IDs
 
     constructor() {
@@ -27,12 +44,20 @@ class guildLobby {
         this.nextID = 1;
     }
     
-    list() {
+    list(): string {
         let s: string = "";
         for(let value of this.lobbies.values()) {
             s += value.desc() + '\n';
         }
         return s.slice(0, -1);
+    }
+
+    has(id: number): boolean {
+        return this.lobbies.has(id);
+    } 
+
+    get(id: number): Lobby {
+        return this.lobbies.get(id);
     }
 
     add(host: bigint): number {
@@ -41,7 +66,7 @@ class guildLobby {
         return this.nextID-1;
     }
 
-    remove(id: number): boolean {
+    del(id: number): boolean {
         return this.lobbies.delete(id);
         // returns false if lobby does not exist
     }
@@ -55,7 +80,16 @@ export const gLobby = {
         this.globbies.set(gid, new guildLobby());
     },
 
-    remove(gid: bigint): boolean {
+    has(gid: bigint): boolean {
+        return this.globbies.has(gid);
+    }, 
+
+    get(gid: bigint): guildLobby {
+        return this.globbies.get(gid);
+    },
+
+    del(gid: bigint): boolean {
         return this.globbies.delete(gid);
+        // returns false if lobby does not exist
     }
 };

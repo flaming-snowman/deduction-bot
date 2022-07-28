@@ -8,13 +8,13 @@ module.exports = {
 		.setDescription('Create a new lobby'),
 	async execute(interaction) {
 		const gid = interaction.guild.id;
-		if(!gLobby.globbies.has(gid)) {
+		if(!gLobby.has(gid)) {
 			gLobby.add(gid);
 		}
-		const lobbyID = gLobby.globbies.get(gid).add(interaction.user.id);
+		const lobbyID = gLobby.get(gid).add(interaction.user.id);
 		const embed = new MessageEmbed()
 			.setTitle("New Lobby Created")
-			.setDescription(gLobby.globbies.get(gid).lobbies.get(lobbyID).desc());    
+			.setDescription(gLobby.get(gid).get(lobbyID).desc());    
 		await interaction.reply({ embeds: [embed] });
 	},
 };

@@ -8,12 +8,12 @@ module.exports = {
 		.setDescription('Display the list of lobbies'),
 	async execute(interaction) {
 		const gid = interaction.guild.id;
-		if(!gLobby.globbies.has(gid)) {
+		if(!gLobby.has(gid)) {
 			gLobby.add(gid);
 		}
 		const embed = new MessageEmbed()
 			.setTitle("List of Lobbies")
-			.setDescription(gLobby.globbies.get(gid).list());     
+			.setDescription(gLobby.get(gid).list());     
 		await interaction.reply({ embeds: [embed] });
 	},
 };
