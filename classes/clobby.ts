@@ -56,7 +56,7 @@ class guildLobby {
         return this.lobbies.has(id);
     } 
 
-    get(id: number): Lobby {
+    get(id: number): Lobby | undefined {
         return this.lobbies.get(id);
     }
 
@@ -85,7 +85,10 @@ export const gLobby = {
     }, 
 
     get(gid: bigint): guildLobby {
-        return this.globbies.get(gid);
+        if(!this.has(gid)) {
+            this.add(gid)
+        }
+        return this.globbies.get(gid)!;
     },
 
     del(gid: bigint): boolean {

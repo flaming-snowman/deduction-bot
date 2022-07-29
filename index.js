@@ -1,12 +1,11 @@
 // Require the necessary imports
-const fs = require('fs');
-const { Client, Collection, Intents } = require('discord.js');
+const fs = require('node:fs');
+const { Client, Collection, GatewayIntentBits, Routes } = require('discord.js');
 const { REST } = require('@discordjs/rest');
-const { Routes } = require('discord-api-types/v9');
 const { clientId, guildId, token } = require('./config.json');
 
 // Create a new client instance
-const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 // Retrieve commands
 client.commands = new Collection();
@@ -21,7 +20,7 @@ for (const file of commandFiles) {
 }
 
 // Register commands in dev guild
-const rest = new REST({ version: '9' }).setToken(token);
+const rest = new REST({ version: '10' }).setToken(token);
 (async () => {
 	try {
 		console.log('Started refreshing application (/) commands.');
