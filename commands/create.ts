@@ -2,18 +2,20 @@ import { SlashCommandBuilder } from '@discordjs/builders';
 import { gLobby } from '../classes/clobby';
 import { EmbedBuilder } from '@discordjs/builders';
 import { ActionRowBuilder, ButtonBuilder } from '@discordjs/builders';
-import { ButtonStyle } from 'discord.js';
+import { ButtonStyle, ChatInputCommandInteraction } from 'discord.js';
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('create')
 		.setDescription('Create a new lobby'),
-	async execute(interaction: any) {
-		const gid = interaction.guild.id;
-		const lobbyID = gLobby.get(gid).add(interaction.user.id);
+	async execute(interaction: ChatInputCommandInteraction) {
+		const gid = BigInt(interaction.guildId!);
+		const globby = gLobby.get(gid);
+		const lobbyID = globby.add(BigInt(interaction.user.id));
+		const lobby = globby.get(lobbyID);
 		const embed = new EmbedBuilder()
 			.setTitle("New Lobby Created")
-			.setDescription(gLobby.get(gid).get(lobbyID)!.desc());    
+			.setDescription(lobby!.desc());    
 		const row = new ActionRowBuilder<ButtonBuilder>()
 			.addComponents(
 				new ButtonBuilder()
@@ -25,6 +27,7 @@ module.exports = {
 					.setLabel('Leave')
 					.setStyle(ButtonStyle.Danger),
 			)
-		await interaction.reply({ embeds: [embed], components: [row] });
+		await interaction.reply({ embeds: [embed], components: [row], fetchReply: true })
+				.then((msg) => globby.updateMsgMap(BigInt(msg.id), lobbyID));
 	},
 };

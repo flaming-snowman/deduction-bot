@@ -29,18 +29,33 @@ class Lobby {
         return this._id;
     }
 
+    memberJoin(uid: bigint): boolean {
+        //returns true if member added to lobby
+        //returns false if member already in lobby
+        if(this._mem.has(uid)) return false;
+        this._mem.add(uid);
+        return true;
+    }
+
+    memberLeave(uid: bigint): boolean {
+        //returns true if member removed from lobby
+        //returns false if member not in lobby to begin with
+        return this._mem.delete(uid);
+    }
+
     desc(): string {
         return `Lobby ${this._id} created <t:${this._time}:R> has ${this._mem.size} members with host <@${this._mem.values().next().value}>.`;
     }
 }
 
 class guildLobby {
-    // map of id: lobbies
-    private lobbies: Map<number, Lobby>;
+    private lobbies: Map<number, Lobby>; // map of lobby id: lobby object
+    private msgmap: Map<bigint, number>; // map of msgid: lobby id
     private nextID: number; // used to allocate new IDs
 
     constructor() {
         this.lobbies = new Map<number, Lobby>();
+        this.msgmap = new Map<bigint, number>();
         this.nextID = 1;
     }
     
@@ -69,6 +84,14 @@ class guildLobby {
     del(id: number): boolean {
         return this.lobbies.delete(id);
         // returns false if lobby does not exist
+    }
+
+    updateMsgMap(msgid: bigint, id: number): void {
+        this.msgmap.set(msgid, id);
+    }
+
+    getFromMsg(msgid: bigint): number | undefined {
+        return this.msgmap.get(msgid);
     }
 }
 
