@@ -18,15 +18,15 @@ module.exports = {
 			}
 		}
 		if (interaction.isButton()) {
-			const command = interaction.client.commands.get(interaction.customId);
+			const button = interaction.client.buttons.get(interaction.customId);
 			console.log(`${interaction.user.tag} in #${interaction.channel.name} used button '${interaction.customId}.'`);
 
-			if (!command) {
+			if (!button) {
 				console.error(`No interaction handler for '${interaction.customId}'`);
 				return;
 			};
 			try {
-				await command.execute(interaction);
+				await button.execute(interaction);
 			}
 			catch (error) {
 				console.error(error);

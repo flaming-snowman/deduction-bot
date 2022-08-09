@@ -5,3 +5,5 @@ commands/*.js
 commands/*.js.map
 classes/*.js
 classes/*.js.map
+buttons/*.js
+buttons/*.js.map
