@@ -95,7 +95,7 @@ class guildLobby {
     }
 }
 
-export const gLobby = {
+export const GLOBBY = {
     // map of gid: lobbies
     globbies: new Map<bigint, guildLobby>(),
 

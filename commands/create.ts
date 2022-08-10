@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { gLobby } from '../classes/clobby';
+import { GLOBBY } from '../classes/clobby';
 import { EmbedBuilder } from '@discordjs/builders';
 import { ActionRowBuilder, ButtonBuilder } from '@discordjs/builders';
 import { ButtonStyle, ChatInputCommandInteraction } from 'discord.js';
@@ -10,7 +10,7 @@ module.exports = {
 		.setDescription('Create a new lobby'),
 	async execute(interaction: ChatInputCommandInteraction) {
 		const gid = BigInt(interaction.guildId!);
-		const globby = gLobby.get(gid);
+		const globby = GLOBBY.get(gid);
 		const lobbyID = globby.add(BigInt(interaction.user.id));
 		const lobby = globby.get(lobbyID);
 		const embed = new EmbedBuilder()
@@ -26,6 +26,10 @@ module.exports = {
 					.setCustomId('leave')
 					.setLabel('Leave')
 					.setStyle(ButtonStyle.Danger),
+				new ButtonBuilder()
+					.setCustomId('start')
+					.setLabel('Start')
+					.setStyle(ButtonStyle.Primary),
 			)
 		await interaction.reply({ embeds: [embed], components: [row], fetchReply: true })
 				.then((msg) => globby.updateMsgMap(BigInt(msg.id), lobbyID));

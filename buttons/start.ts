@@ -4,7 +4,7 @@ import { ActionRowBuilder, ButtonBuilder } from '@discordjs/builders';
 import { ButtonInteraction, ButtonStyle } from 'discord.js';
 
 module.exports = {
-	name: 'join',
+	name: 'start',
 	async execute(interaction: ButtonInteraction) {
 		const gid = BigInt(interaction.guildId!);
 		const globby = GLOBBY.get(gid);
@@ -14,14 +14,9 @@ module.exports = {
 			return;
 		}
 		const lobby = globby.get(lobbyID!);
-		const realjoin = lobby?.memberJoin(BigInt(interaction.user.id));
-		if(!realjoin) {
-			await interaction.reply({ content: "You are already in the lobby", ephemeral: true });
-			return;
-		}
 		const embed = new EmbedBuilder()
-			.setTitle("Lobby Joined")
+			.setTitle("Lobby started")
 			.setDescription(lobby!.desc());    
-		await interaction.reply({ embeds: [embed], ephemeral: true });
+		await interaction.reply({ embeds: [embed] });
 	},
 };
