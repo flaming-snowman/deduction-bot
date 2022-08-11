@@ -11,7 +11,7 @@ module.exports = {
 	async execute(interaction: ChatInputCommandInteraction) {
 		const gid = BigInt(interaction.guildId!);
 		const globby = GLOBBY.get(gid);
-		const lobbyID = globby.add(BigInt(interaction.user.id));
+		const lobbyID = globby.addAvalon(BigInt(interaction.user.id));
 		const lobby = globby.get(lobbyID);
 		const embed = new EmbedBuilder()
 			.setTitle("New Lobby Created")

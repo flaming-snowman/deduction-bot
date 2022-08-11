@@ -1,9 +1,14 @@
+import { AnyThreadChannel } from "discord.js";
+import { GLOBBY } from "./globby";
+
 export class Lobby {
     // uids for each user in the lobby
     protected _mem: Set<bigint>; // list of members
     private _time: number;
     private _started: boolean;
     private _id: number;
+    protected _name: string = "NOT IMPLEMENTED";
+    protected _thread?: AnyThreadChannel;
 
     constructor(num: number, host: bigint) {
         this._mem = new Set<bigint>();
@@ -23,6 +28,10 @@ export class Lobby {
 
     public get id(): number {
         return this._id;
+    }
+
+    public get name(): string {
+        return this._name;
     }
 
     memberJoin(uid: bigint): boolean {
@@ -51,5 +60,14 @@ export class Lobby {
 
     desc(): string {
         return `Lobby ${this._id} created <t:${this._time}:R> has ${this._mem.size} members with host <@${this._mem.values().next().value}>.`;
+    }
+
+    setup(thread: AnyThreadChannel): void {
+        this._thread = thread;
+        GLOBBY.get(BigInt(thread.guildId)).updateThreadMap(BigInt(thread.id), this._id);
+    }
+
+    getRole(uid: bigint): string | undefined {
+        return "NOT IMPLEMENTED";
     }
 }

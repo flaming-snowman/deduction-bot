@@ -4,11 +4,13 @@ import { Avalon } from './avalon'
 class guildLobby {
     private lobbies: Map<number, Lobby>; // map of lobby id: lobby object
     private msgmap: Map<bigint, number>; // map of msgid: lobby id
+    private threadmap: Map<bigint, number>; // map of threadid: lobby id
     private nextID: number; // used to allocate new IDs
 
     constructor() {
         this.lobbies = new Map<number, Lobby>();
         this.msgmap = new Map<bigint, number>();
+        this.threadmap = new Map<bigint, number>();
         this.nextID = 1;
     }
     
@@ -51,6 +53,14 @@ class guildLobby {
 
     getFromMsg(msgid: bigint): number | undefined {
         return this.msgmap.get(msgid);
+    }
+
+    updateThreadMap(threadid: bigint, id: number): void {
+        this.threadmap.set(threadid, id);
+    }
+
+    getFromThread(threadid: bigint): number | undefined {
+        return this.threadmap.get(threadid);
     }
 }
 
