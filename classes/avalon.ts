@@ -1,4 +1,5 @@
 // This is a lot of boilerplating I'm really sorry if you try to read this
+import { Lobby } from './lobby'
 
 class Res
 {
@@ -104,8 +105,10 @@ class Mission
     }
 }
 
-class Avalon
+export class Avalon extends Lobby
 {
+    private minSize = 5;
+    private maxSize = 10;
     private msetup: number[][] =
     [
         [2,3,2,3,3],
@@ -124,4 +127,12 @@ class Avalon
         [new Merl(), new Percy(), new Res(), new Res(), new Res(), new Morg(), new Ass(), new Mord()],
         [new Merl(), new Percy(), new Res(), new Res(), new Res(), new Morg(), new Ass(), new Spy(), new Ober()],
     ]
+    constructor(num: number, host: bigint) {
+        super(num, host);
+    }
+    start(uid: bigint): number {
+        if(this._mem.size < this.minSize || this._mem.size > this.maxSize) return 2;
+        if(super.start(uid) == 1) return 1;
+        return 0;
+    }
 }

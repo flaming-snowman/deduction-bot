@@ -1,4 +1,4 @@
-import { GLOBBY } from '../classes/clobby';
+import { GLOBBY } from '../classes/globby';
 import { EmbedBuilder } from '@discordjs/builders';
 import { ActionRowBuilder, ButtonBuilder } from '@discordjs/builders';
 import { ButtonInteraction, ButtonStyle } from 'discord.js';

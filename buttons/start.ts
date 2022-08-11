@@ -1,4 +1,4 @@
-import { GLOBBY } from '../classes/clobby';
+import { GLOBBY } from '../classes/globby';
 import { EmbedBuilder } from '@discordjs/builders';
 import { ActionRowBuilder, ButtonBuilder } from '@discordjs/builders';
 import { ButtonInteraction, ButtonStyle } from 'discord.js';
@@ -14,9 +14,33 @@ module.exports = {
 			return;
 		}
 		const lobby = globby.get(lobbyID!);
+		const response = lobby?.start(BigInt(interaction.user.id));
+		if(response != 0) {
+			await interaction.reply({ content: 'Error: Lobby was unable to start', ephemeral: true });
+			return;
+		}
 		const embed = new EmbedBuilder()
-			.setTitle("Lobby started")
-			.setDescription(lobby!.desc());    
-		await interaction.reply({ embeds: [embed] });
-	},
+		.setTitle("Lobby started")
+		.setDescription(lobby!.desc());  
+		const row = new ActionRowBuilder<ButtonBuilder>()
+		.addComponents(
+			new ButtonBuilder()
+				.setCustomId('join')
+				.setLabel('Join')
+				.setStyle(ButtonStyle.Success)
+				.setDisabled(true),
+			new ButtonBuilder()
+				.setCustomId('leave')
+				.setLabel('Leave')
+				.setStyle(ButtonStyle.Danger)
+				.setDisabled(true),
+			new ButtonBuilder()
+				.setCustomId('start')
+				.setLabel('Start')
+				.setStyle(ButtonStyle.Primary)
+				.setDisabled(true),
+		)
+		await interaction.message.edit({ embeds: [embed], components: [row] });
+		await interaction.reply({ content: "Lobby successfully started!", ephemeral: true })
+	}
 };

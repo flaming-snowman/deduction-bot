@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { GLOBBY } from '../classes/clobby'
+import { GLOBBY } from '../classes/globby'
 import { EmbedBuilder } from '@discordjs/builders';
 
 module.exports = {
