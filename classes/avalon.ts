@@ -1,5 +1,6 @@
 // This is a lot of boilerplating I'm really sorry if you try to read this
-import { ActionRowBuilder, AnyThreadChannel, ButtonBuilder, ButtonStyle, EmbedBuilder } from 'discord.js';
+import { SelectMenuBuilder } from '@discordjs/builders';
+import { ActionRowBuilder, AnyThreadChannel, ButtonBuilder, ButtonStyle, EmbedBuilder, ThreadAutoArchiveDuration, ThreadMember } from 'discord.js';
 import { Lobby } from './lobby'
 
 class Res
@@ -112,6 +113,10 @@ export class Avalon extends Lobby
     private maxSize = 10;
     private gameSize?: number;
     private roleMap?: Map<bigint, Res>;
+    private playOrder?: bigint[];
+    private turn = 0;
+    private bigMission = 1;
+    private subMission = 1;
     private msetup: number[][] =
     [
         [2,3,2,3,3],
@@ -144,20 +149,27 @@ export class Avalon extends Lobby
         return 0;
     }
 
+    shuf(arr: any[]): void {
+        let curr = arr.length, rand: number;
+        while(curr > 1) {
+            rand = Math.floor(Math.random() * curr);
+            curr--;
+            [arr[curr], arr[rand]] = [arr[rand], arr[curr]];
+        }
+    }
+
     setup(thread: AnyThreadChannel): void {
         super.setup(thread);
         //shuffle and assign roles
-        let curr = this.gameSize!, rand: number;
-        let roles = this.rsetup[curr-5];
-        while(curr > 0) {
-            rand = Math.floor(Math.random() * curr);
-            curr--;
-            [roles[curr], roles[rand]] = [roles[rand], roles[curr]];
-        }
+        let roles = this.rsetup[this.gameSize!-5];
+        this.shuf(roles);
+        roles.forEach(x => console.log(x.name));
         this.roleMap = new Map<bigint, Res>();
-        for(let mem of this._mem.values()) {
-            this.roleMap.set(mem, roles[curr++]);
+        this.playOrder = Array.from(this._mem);
+        for(let i = 0; i < roles.length; i++) {
+            this.roleMap.set(this.playOrder[i], roles[i]);
         }
+        this.shuf(this.playOrder);
 
         const embed = new EmbedBuilder()
 		.setTitle("Lobby started")
@@ -171,6 +183,42 @@ export class Avalon extends Lobby
 				.setStyle(ButtonStyle.Primary)
 		);
         thread.send({ embeds: [embed], components: [row] });
+
+        this.nextMission();
+    }
+
+    nextMission() {
+        let gameSize = this.gameSize!;
+        let missionSize = this.msetup[gameSize-5][this.bigMission-1];
+        
+        let playerString = "";
+        for(let i = 0; i < gameSize; i++) {
+            if(i == this.turn%gameSize) {
+                playerString += ':crown: ';
+            } 
+            if(i == (this.turn+5)%gameSize) {
+                playerString += ':hammer: ';
+            }
+            playerString += `<@${this.playOrder![i]}>`;
+            if(i < gameSize-1) playerString += '\n';
+        }
+        const embed = new EmbedBuilder()
+        .setTitle(`Mission ${this.bigMission}.${this.subMission}`)
+        .setDescription(playerString);
+
+        const row = new ActionRowBuilder<SelectMenuBuilder>()
+        .addComponents(
+            new SelectMenuBuilder()
+                .setCustomId('pickmission')
+                .setPlaceholder(`Select ${missionSize} players`)
+                .setMinValues(missionSize)
+                .setMaxValues(missionSize)
+                .addOptions(
+                    Array.from(this.playOrder!, (x, i) => ({label: this._members!.get(x)!.displayName, value: String(i)}))
+                )
+        )
+        this._thread?.send({ embeds: [embed], components: [row] });
+        this.turn++;
     }
 
     getRole(uid: bigint): string | undefined {

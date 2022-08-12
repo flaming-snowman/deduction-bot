@@ -1,7 +1,7 @@
 import { GLOBBY } from '../classes/globby';
 import { EmbedBuilder } from '@discordjs/builders';
 import { ActionRowBuilder, ButtonBuilder } from '@discordjs/builders';
-import { ButtonInteraction, ButtonStyle, TextChannel } from 'discord.js';
+import { ButtonInteraction, ButtonStyle, GuildMember, TextChannel } from 'discord.js';
 
 module.exports = {
 	name: 'start',
@@ -19,6 +19,15 @@ module.exports = {
 			await interaction.reply({ content: 'Error: Lobby was unable to start', ephemeral: true });
 			return;
 		}
+		const memberCollection = await interaction.guild?.members.fetch({ user: Array.from(lobby.mem, x => String(x)) });
+		if(!memberCollection) {
+			throw new Error("One or more users not found");
+		}
+		const members = new Map<bigint, GuildMember>();
+		for(let [key, value] of memberCollection) {
+			members.set(BigInt(key), value);
+		}
+		lobby.updateMembers(members);
 
 		const thread = await (interaction.channel as TextChannel).threads.create({
 			name: `Lobby ${lobbyID} - ${lobby.name}`,
@@ -49,7 +58,7 @@ module.exports = {
 				.setDisabled(true),
 		);
 
-		await interaction.message.edit({ embeds: [embed], components: [row] });
+		//await interaction.message.edit({ embeds: [embed], components: [row] });
 		await interaction.reply({ content: "Lobby successfully started!", ephemeral: true })
 		
 		lobby.setup(thread);

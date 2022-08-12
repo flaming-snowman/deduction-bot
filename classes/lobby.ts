@@ -1,4 +1,4 @@
-import { AnyThreadChannel } from "discord.js";
+import { AnyThreadChannel, GuildDefaultMessageNotifications, GuildMember } from "discord.js";
 import { GLOBBY } from "./globby";
 
 export class Lobby {
@@ -9,6 +9,7 @@ export class Lobby {
     private _id: number;
     protected _name: string = "NOT IMPLEMENTED";
     protected _thread?: AnyThreadChannel;
+    protected _members?: Map<bigint, GuildMember>;
 
     constructor(num: number, host: bigint) {
         this._mem = new Set<bigint>();
@@ -16,6 +17,10 @@ export class Lobby {
         this._id = num;
         this._time = Math.floor(Date.now()/1000);
         this._started = false;
+    }
+
+    public get mem(): Set<bigint> {
+        return this._mem;
     }
 
     public get time(): number {
@@ -48,6 +53,10 @@ export class Lobby {
         return this._mem.delete(uid);
     }
 
+    updateMembers(members: Map<bigint, GuildMember>): void {
+        this._members = members;
+    }
+
     start(uid: bigint): number {
         const host = this._mem.values().next().value;
         if(uid != host) {
@@ -65,6 +74,9 @@ export class Lobby {
     setup(thread: AnyThreadChannel): void {
         this._thread = thread;
         GLOBBY.get(BigInt(thread.guildId)).updateThreadMap(BigInt(thread.id), this._id);
+        let mentionMembers = "";
+        this._mem!.forEach(x => mentionMembers += `<@${x}>`);
+        //thread.send({ content: mentionMembers });
     }
 
     getRole(uid: bigint): string | undefined {
