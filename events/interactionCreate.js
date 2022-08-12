@@ -3,7 +3,7 @@ module.exports = {
 	async execute(interaction) {
 		if (interaction.isChatInputCommand()) {
 			const command = interaction.client.commands.get(interaction.commandName);
-			console.log(`${interaction.user.tag} in #${interaction.channel.name} used command '${interaction.commandName}.'`);
+			console.log(`${interaction.user.tag} in #${interaction.channel.name} used command '${interaction.commandName}'.`);
 
 			if (!command) {
 				console.error(`No interaction handler for '${interaction.commandName}'`);
