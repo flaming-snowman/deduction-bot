@@ -7,7 +7,8 @@ import { ButtonStyle, ChatInputCommandInteraction } from 'discord.js';
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('create')
-		.setDescription('Create a new lobby'),
+		.setDescription('Create a new lobby')
+		.setDMPermission(false),
 	async execute(interaction: ChatInputCommandInteraction) {
 		const gid = BigInt(interaction.guildId!);
 		const globby = GLOBBY.get(gid);

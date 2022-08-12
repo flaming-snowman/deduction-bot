@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { GLOBBY } from '../classes/globby'
 import { EmbedBuilder } from '@discordjs/builders';
-import { ChatInputCommandInteraction } from 'discord.js';
+import { ChatInputCommandInteraction, PermissionFlagsBits } from 'discord.js';
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -14,7 +14,9 @@ module.exports = {
 		.addIntegerOption(option =>
 			option.setName('lobby')
 				.setDescription('lobby id')
-				.setRequired(true)),
+				.setRequired(true))
+		.setDMPermission(false)
+		.setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 	async execute(interaction: ChatInputCommandInteraction) {
 		const gid = BigInt(interaction.guildId!);
 		const globby = GLOBBY.get(gid);
