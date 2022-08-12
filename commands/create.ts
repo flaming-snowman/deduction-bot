@@ -1,4 +1,4 @@
-import { SlashCommandBuilder } from '@discordjs/builders';
+import { SlashCommandBuilder, SlashCommandSubcommandBuilder } from '@discordjs/builders';
 import { GLOBBY } from '../classes/globby';
 import { EmbedBuilder } from '@discordjs/builders';
 import { ActionRowBuilder, ButtonBuilder } from '@discordjs/builders';
@@ -8,11 +8,20 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('create')
 		.setDescription('Create a new lobby')
-		.setDMPermission(false),
+		.setDMPermission(false)
+		.addSubcommand(new SlashCommandSubcommandBuilder()
+		.setName('avalon')
+		.setDescription('Create an Avalon lobby')
+		),
 	async execute(interaction: ChatInputCommandInteraction) {
 		const gid = BigInt(interaction.guildId!);
 		const globby = GLOBBY.get(gid);
-		const lobbyID = globby.addAvalon(BigInt(interaction.user.id));
+		let lobbyID: number;
+		if(interaction.options.getSubcommand() == 'avalon') {
+			lobbyID = globby.addAvalon(BigInt(interaction.user.id));
+		} else {
+			lobbyID = globby.add(BigInt(interaction.user.id));
+		}
 		const lobby = globby.get(lobbyID);
 		const embed = new EmbedBuilder()
 			.setTitle("New Lobby Created")
