@@ -19,7 +19,7 @@ module.exports = {
 		}
 		if (interaction.isButton()) {
 			const button = interaction.client.buttons.get(interaction.customId);
-			console.log(`${interaction.user.tag} in #${interaction.channel.name} used button '${interaction.customId}.'`);
+			console.log(`${interaction.user.tag} in #${interaction.channel.name} used button '${interaction.customId}'.`);
 
 			if (!button) {
 				console.error(`No interaction handler for '${interaction.customId}'`);
