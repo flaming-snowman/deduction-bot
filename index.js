@@ -11,6 +11,12 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 client.commands = new Collection();
 const commands = [];
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+const commandDirs = fs.readdirSync('./commands').filter(dir => fs.statSync(`./commands/${dir}`).isDirectory());
+for (const dir of commandDirs) {
+	let files = fs.readdirSync(`./commands/${dir}`).filter(file => file.endsWith('.js'));
+	files.forEach((value,index,array) => array[index] = `${dir}/${value}`)
+	commandFiles.push(files);
+}
 for (const file of commandFiles) {
 	const command = require(`./commands/${file}`);
 	// Set a new item in the Collection
@@ -22,6 +28,12 @@ for (const file of commandFiles) {
 // Retrieve buttons
 client.buttons = new Collection();
 const buttonFiles = fs.readdirSync('./buttons').filter(file => file.endsWith('.js'));
+const buttonDirs = fs.readdirSync('./buttons').filter(dir => fs.statSync(`./buttons/${dir}`).isDirectory());
+for (const dir of buttonDirs) {
+	let files = fs.readdirSync(`./buttons/${dir}`).filter(file => file.endsWith('.js'));
+	files.forEach((value,index,array) => array[index] = `${dir}/${value}`)
+	buttonFiles.push(files);
+}
 for (const file of buttonFiles) {
 	const button = require(`./buttons/${file}`);
 	client.buttons.set(button.name, button);
