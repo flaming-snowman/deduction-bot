@@ -33,5 +33,21 @@ module.exports = {
 				await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
 			}
 		}
+		if (interaction.isSelectMenu()) {
+			const smenu = interaction.client.selectmenus.get(interaction.customId);
+			console.log(`${interaction.user.tag} in #${interaction.channel.name} used select menu '${interaction.customId}'.`);
+
+			if (!smenu) {
+				console.error(`No interaction handler for '${interaction.customId}'`);
+				return;
+			};
+			try {
+				await smenu.execute(interaction);
+			}
+			catch (error) {
+				console.error(error);
+				await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+			}
+		}
 	},
 };
