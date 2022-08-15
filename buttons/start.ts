@@ -23,9 +23,9 @@ module.exports = {
 		if(!memberCollection) {
 			throw new Error("One or more users not found");
 		}
-		const members = new Map<bigint, GuildMember>();
+		const members = new Map<bigint, string>();
 		for(let [key, value] of memberCollection) {
-			members.set(BigInt(key), value);
+			members.set(BigInt(key), value.displayName);
 		}
 		lobby.updateMembers(members);
 
@@ -58,8 +58,7 @@ module.exports = {
 				.setDisabled(true),
 		);
 
-		//await interaction.message.edit({ embeds: [embed], components: [row] });
-		await interaction.reply({ content: "Lobby successfully started!", ephemeral: true })
+		await interaction.update({ embeds: [embed], components: [row] });
 		
 		lobby.setup(thread);
 	}

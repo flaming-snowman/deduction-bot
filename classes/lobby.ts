@@ -9,7 +9,7 @@ export class Lobby {
     private _id: number;
     protected _name: string = "NOT IMPLEMENTED";
     protected _thread?: AnyThreadChannel;
-    protected _members?: Map<bigint, GuildMember>;
+    protected _nameMap?: Map<bigint, string>;
 
     constructor(num: number, host: bigint) {
         this._mem = new Set<bigint>();
@@ -53,8 +53,8 @@ export class Lobby {
         return this._mem.delete(uid);
     }
 
-    updateMembers(members: Map<bigint, GuildMember>): void {
-        this._members = members;
+    updateMembers(members: Map<bigint, string>): void {
+        this._nameMap = members;
     }
 
     start(uid: bigint): number {
