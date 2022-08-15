@@ -84,19 +84,40 @@ class Ober extends Res
 
 class Mission
 {
+    missionMem: Set<bigint>;
+    notVoted: Set<bigint>;
     private fails: number = 0;
     private failsreq: number;
-    constructor(mem: Set<Res>, gamesize: number, mission: number) {
+    constructor(mem: Set<bigint>, gamesize: number, mission: number) {
+        this.missionMem = new Set<bigint>(mem);
+        this.notVoted = new Set<bigint>(mem);
+
         if(gamesize < 7 || mission != 4) {
             this.failsreq = 1;
         } else {
             this.failsreq = 2;
         }
-        for(const r of mem.values()) {
-            if(r.spy) {
-                this.fails++;
-            }
+    }
+    vote(uid: bigint, failed: boolean): number {
+        /*
+            0: vote recorded
+            1: player not on mission
+            2: player already voted
+        */
+        if(!this.notVoted.has(uid)) return 2;
+        if(this.missionMem.has(uid)) {
+            if(failed) this.fails++;
+            this.notVoted.delete(uid);
+            return 0;
         }
+        return 1;
+    }
+    list(): string {
+        let s = "";
+        for(const p of this.missionMem) {
+            s += `<@${p}>\n`;
+        }
+        return s.slice(0, -1);
     }
     success(): boolean {
         return this.fails < this.failsreq;
@@ -117,6 +138,8 @@ export class Avalon extends Lobby
     private turn = 0;
     private bigMission = 1;
     private subMission = 1;
+    private failNum = 0;
+    private curMission?: Mission;
     private msetup: number[][] =
     [
         [2,3,2,3,3],
@@ -193,7 +216,7 @@ export class Avalon extends Lobby
         
         let playerString = "";
         for(let i = 0; i < gameSize; i++) {
-            if(i == this.turn%gameSize) {
+            if(i == this.turn) {
                 playerString += ':crown: ';
             } 
             if(i == (this.turn+5)%gameSize) {
@@ -214,11 +237,22 @@ export class Avalon extends Lobby
                 .setMinValues(missionSize)
                 .setMaxValues(missionSize)
                 .addOptions(
-                    Array.from(this.playOrder!, (x, i) => ({label: this._members!.get(x)!.displayName, value: String(i)}))
+                    Array.from(this.playOrder!, (x, i) => ({label: this._nameMap!.get(x)!, value: String(i)}))
                 )
         )
         this._thread?.send({ embeds: [embed], components: [row] });
-        this.turn++;
+    }
+
+    voteMission(uid: bigint, selected: string[]): string | null {
+        if(this.playOrder![this.turn] != uid) return null;
+        let players: Set<bigint> = new Set<bigint>();
+        for(const p of selected) {
+            players.add(this.playOrder![Number(p)]!);
+        }
+
+        this.curMission = new Mission(players, this.gameSize!, this.bigMission);
+        
+        return this.curMission.list();
     }
 
     getRole(uid: bigint): string | undefined {

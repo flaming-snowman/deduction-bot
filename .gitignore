@@ -1,9 +1,11 @@
 node_modules
 .env
 config.json
-commands/*.js
-commands/*.js.map
-classes/*.js
-classes/*.js.map
-buttons/*.js
-buttons/*.js.map
+commands/**/*.js
+commands/**/*.js.map
+classes/**/*.js
+classes/**/*.js.map
+buttons/**/*.js
+buttons/**/*.js.map
+selectmenus/**/*.js
+selectmenus/**/*.js.map
