@@ -270,12 +270,12 @@ export class Avalon extends Lobby
             2: player already voted
             3: all votes in
         */
+        if(!this._mem.has(uid)) return 1;
         if(!this.notVoted!.has(uid)) return 2;
         if(approved) this.apps!.add(uid);
         this.notVoted!.delete(uid);
         if(this.notVoted!.size == 0) return 3;
         return 0;
-        return 1;
     }
 
     getNotVoted(): string {
