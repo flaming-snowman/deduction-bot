@@ -98,7 +98,7 @@ class Mission
             this.failsreq = 2;
         }
     }
-    vote(uid: bigint, failed: boolean): number {
+    embark(uid: bigint, failed: boolean): number {
         /*
             0: vote recorded
             1: player not on mission
@@ -130,7 +130,7 @@ class Mission
 
 export class Avalon extends Lobby
 {
-    private minSize = 5;
+    private minSize = 1;
     private maxSize = 10;
     private gameSize?: number;
     private roleMap?: Map<bigint, Res>;
@@ -139,9 +139,13 @@ export class Avalon extends Lobby
     private bigMission = 1;
     private subMission = 1;
     private failNum = 0;
+    private apps?: Set<bigint>;
     private curMission?: Mission;
+    private notVoted?: Set<bigint>;
     private msetup: number[][] =
     [
+        [1,1,1,1,1],
+        [1,1,1,1,1],
         [2,3,2,3,3],
         [2,3,4,3,4],
         [2,3,3,4,4],
@@ -151,6 +155,8 @@ export class Avalon extends Lobby
     ]
     private rsetup: Res[][] =
     [
+        [new Res()],
+        [new Merl(), new Ass()],
         [new Merl(), new Percy(), new Res(), new Morg(), new Ass()],
         [new Merl(), new Percy(), new Res(), new Res(), new Morg(), new Ass()],
         [new Merl(), new Percy(), new Res(), new Res(), new Morg(), new Ass(), new Ober()],
@@ -184,7 +190,7 @@ export class Avalon extends Lobby
     setup(thread: AnyThreadChannel): void {
         super.setup(thread);
         //shuffle and assign roles
-        let roles = this.rsetup[this.gameSize!-5];
+        let roles = this.rsetup[this.gameSize!-this.minSize];
         this.shuf(roles);
         roles.forEach(x => console.log(x.name));
         this.roleMap = new Map<bigint, Res>();
@@ -212,7 +218,7 @@ export class Avalon extends Lobby
 
     nextMission() {
         let gameSize = this.gameSize!;
-        let missionSize = this.msetup[gameSize-5][this.bigMission-1];
+        let missionSize = this.msetup[gameSize-this.minSize][this.bigMission-1];
         
         let playerString = "";
         for(let i = 0; i < gameSize; i++) {
@@ -243,7 +249,7 @@ export class Avalon extends Lobby
         this._thread?.send({ embeds: [embed], components: [row] });
     }
 
-    voteMission(uid: bigint, selected: string[]): string | null {
+    pickMission(uid: bigint, selected: string[]): string | null {
         if(this.playOrder![this.turn] != uid) return null;
         let players: Set<bigint> = new Set<bigint>();
         for(const p of selected) {
@@ -251,9 +257,48 @@ export class Avalon extends Lobby
         }
 
         this.curMission = new Mission(players, this.gameSize!, this.bigMission);
+        this.apps = new Set<bigint>();
+        this.notVoted = new Set<bigint>(this._mem);
         
         return this.curMission.list();
     }
+
+    voteMission(uid: bigint, approved: boolean): number {
+        /*
+            0: vote recorded
+            1: player not in game
+            2: player already voted
+            3: all votes in
+        */
+        if(!this.notVoted!.has(uid)) return 2;
+        if(approved) this.apps!.add(uid);
+        this.notVoted!.delete(uid);
+        if(this.notVoted!.size == 0) return 3;
+        return 0;
+        return 1;
+    }
+
+    getNotVoted(): string {
+        let s = "";
+        for(const p of this.notVoted!) {
+            s += `<@${p}>\n`;
+        }
+        return s.slice(0, -1); 
+    }
+    
+    voteString(): string {
+        let s = "";
+        for(const p of this.playOrder!) {
+            s += this.apps!.has(p) ? ":white_check_mark: " : ":x: ";
+            s += `<@${p}>\n`;
+        }
+        return s.slice(0, -1); 
+    }
+
+    votePass(): boolean {
+        return this.apps!.size*2 > this.gameSize!;
+    }
+
 
     getRole(uid: bigint): string | undefined {
         return this.roleMap?.get(uid)?.name;

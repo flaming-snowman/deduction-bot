@@ -16,7 +16,7 @@ module.exports = {
 		}
 		const lobby = globby.get(lobbyID!)! as Avalon;
 
-		const result = lobby.voteMission(BigInt(interaction.user.id), interaction.values);
+		const result = lobby.pickMission(BigInt(interaction.user.id), interaction.values);
 
 		if(!result) {
 			await interaction.reply({ content: "Sorry! It is not your pick.", ephemeral: true });
@@ -25,7 +25,10 @@ module.exports = {
 		
 		const embed = new EmbedBuilder()
         .setTitle(`Proposed Mission`)
-		.setDescription(result);
+		.setDescription(result)
+		.addFields(
+			{ name: 'Waiting on votes from:', value: lobby.getNotVoted() },
+		);
 
 		const row = new ActionRowBuilder<ButtonBuilder>()
 		.addComponents(
