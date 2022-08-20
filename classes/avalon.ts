@@ -98,19 +98,19 @@ class Mission
             this.failsreq = 2;
         }
     }
-    embark(uid: bigint, failed: boolean): number {
+    vote(uid: bigint, failed: boolean): number {
         /*
             0: vote recorded
             1: player not on mission
             2: player already voted
+            3: all votes in
         */
+        if(!this.missionMem.has(uid)) return 1;
         if(!this.notVoted.has(uid)) return 2;
-        if(this.missionMem.has(uid)) {
-            if(failed) this.fails++;
-            this.notVoted.delete(uid);
-            return 0;
-        }
-        return 1;
+        if(failed) this.fails++;
+        this.notVoted.delete(uid);
+        if(this.notVoted.size == 0) return 3;
+        return 0;
     }
     list(): string {
         let s = "";
@@ -118,6 +118,13 @@ class Mission
             s += `<@${p}>\n`;
         }
         return s.slice(0, -1);
+    }
+    getNotVoted(): string {
+        let s = "";
+        for(const p of this.notVoted!) {
+            s += `<@${p}>\n`;
+        }
+        return s.slice(0, -1); 
     }
     success(): boolean {
         return this.fails < this.failsreq;
@@ -135,9 +142,10 @@ export class Avalon extends Lobby
     private gameSize?: number;
     private roleMap?: Map<bigint, Res>;
     private playOrder?: bigint[];
-    private turn = 0;
+    private turn = -1;
     private bigMission = 1;
-    private subMission = 1;
+    private subMission = 0;
+    private hammer = 4;
     private failNum = 0;
     private apps?: Set<bigint>;
     private curMission?: Mission;
@@ -220,12 +228,19 @@ export class Avalon extends Lobby
         let gameSize = this.gameSize!;
         let missionSize = this.msetup[gameSize-this.minSize][this.bigMission-1];
         
+        this.subMission++;
+        this.turn++;
+
+        if(this.subMission == 6) {
+            // spies win
+        }
+
         let playerString = "";
         for(let i = 0; i < gameSize; i++) {
-            if(i == this.turn) {
+            if(i == this.turn%gameSize) {
                 playerString += ':crown: ';
             } 
-            if(i == (this.turn+5)%gameSize) {
+            if(i == this.hammer%gameSize) {
                 playerString += ':hammer: ';
             }
             playerString += `<@${this.playOrder![i]}>`;
@@ -250,7 +265,7 @@ export class Avalon extends Lobby
     }
 
     pickMission(uid: bigint, selected: string[]): string | null {
-        if(this.playOrder![this.turn] != uid) return null;
+        if(this.playOrder![this.turn%this.gameSize!] != uid) return null;
         let players: Set<bigint> = new Set<bigint>();
         for(const p of selected) {
             players.add(this.playOrder![Number(p)]!);
@@ -299,6 +314,57 @@ export class Avalon extends Lobby
         return this.apps!.size*2 > this.gameSize!;
     }
 
+    embarkMission(): void {
+        const embed = new EmbedBuilder()
+        .setTitle(`Mission ${this.bigMission}`)
+        .setDescription(this.curMission!.list())
+        .addFields(
+            { name: 'Waiting on votes from:', value: this.curMission!.getNotVoted() },
+        );
+
+        const row = new ActionRowBuilder<ButtonBuilder>()
+		.addComponents(
+			new ButtonBuilder()
+			.setCustomId('succeed')
+			.setLabel('Succeed')
+			.setStyle(ButtonStyle.Success),
+			new ButtonBuilder()
+			.setCustomId('fail')
+			.setLabel('Fail')
+			.setStyle(ButtonStyle.Danger)
+		);
+
+        this._thread?.send({ embeds: [embed], components: [row] });
+    }
+
+    voteEmbark(uid: bigint, failed: boolean): number {
+        return this.curMission!.vote(uid, failed);
+    }
+
+    getEmbarkNotVoted(): string {
+        return this.curMission!.getNotVoted();
+    }
+
+    embarkSuccess(): boolean {
+        return this.curMission!.success();
+    }
+
+    embarkResult(): string {
+        return this.curMission!.result();
+    }
+
+    embarkFinish(): void {
+        if(!this.embarkSuccess()) this.failNum++;
+        if(this.failNum == 3) {
+            //spies win
+        }
+        if(this.bigMission-this.failNum == 3) {
+            //ass time
+        }
+        this.bigMission++;
+        this.subMission = 0;
+        this.nextMission();
+    }
 
     getRole(uid: bigint): string | undefined {
         return this.roleMap?.get(uid)?.name;

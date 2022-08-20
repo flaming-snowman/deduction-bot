@@ -48,6 +48,11 @@ module.exports = {
 					{ name: 'Vote results:', value: lobby.voteString() },
 				);
 			await interaction.update({ embeds: [interaction.message.embeds[0], embed], components: [] });
+			
+			if(lobby.votePass()) lobby.embarkMission();
+			else {
+				lobby.nextMission();
+			}
 			return;
 		}
 	},
