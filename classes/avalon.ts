@@ -1,6 +1,6 @@
 // This is a lot of boilerplating I'm really sorry if you try to read this
 import { SelectMenuBuilder } from '@discordjs/builders';
-import { ActionRowBuilder, AnyThreadChannel, ButtonBuilder, ButtonStyle, EmbedBuilder, ThreadAutoArchiveDuration, ThreadMember } from 'discord.js';
+import { ActionRowBuilder, AnyThreadChannel, ButtonBuilder, ButtonStyle, Colors, EmbedBuilder, ThreadAutoArchiveDuration, ThreadMember } from 'discord.js';
 import { Lobby } from './lobby'
 
 class Res
@@ -12,6 +12,9 @@ class Res
     morg: boolean = false;
     mord: boolean = false;
     ober: boolean = false;
+    tris: boolean = false;
+    isol: boolean = false;
+    lover: boolean = false;
     name: string = "Resistance";
 }
 
@@ -33,6 +36,25 @@ class Percy extends Res
     }
 }
 
+class Tristan extends Res
+{
+    constructor() {
+        super();
+        this.tris = true;
+        this.lover = true;
+        this.name = "Tristan";
+    }
+}
+
+class Isolde extends Res
+{
+    constructor() {
+        super();
+        this.isol = true;
+        this.lover = true;
+        this.name = "Isolde";
+    }
+}
 class Spy extends Res
 {
     constructor() {
@@ -231,10 +253,6 @@ export class Avalon extends Lobby
         this.subMission++;
         this.turn++;
 
-        if(this.subMission == 6) {
-            // spies win
-        }
-
         let playerString = "";
         for(let i = 0; i < gameSize; i++) {
             if(i == this.turn%gameSize) {
@@ -356,14 +374,87 @@ export class Avalon extends Lobby
     embarkFinish(): void {
         if(!this.embarkSuccess()) this.failNum++;
         if(this.failNum == 3) {
-            //spies win
+            this.finishGame(false);
+            return;
         }
         if(this.bigMission-this.failNum == 3) {
-            //ass time
+            for(const uid of this._mem) {
+                if(this.roleMap!.get(uid)!.ass) {
+                    this.startAss(uid);
+                    return;
+                }
+            }
+            this.finishGame(true);
+            return;
         }
         this.bigMission++;
         this.subMission = 0;
         this.nextMission();
+    }
+
+    startAss(ass: bigint): void {
+        let minass: number = 1, maxass: number = 1;
+        let merl = false, tristan = false, isolde = false;
+        for(const uid of this._mem) {
+            if(this.roleMap!.get(uid)!.merl) merl = true;
+            if(this.roleMap!.get(uid)!.tris) tristan = true;
+            if(this.roleMap!.get(uid)!.isol) isolde = true;
+        }
+        if(merl && tristan && isolde) {
+            maxass = 2;
+        }
+        else if(tristan && isolde) {
+            minass = 2;
+            maxass = 2;
+        }
+        else if(!merl) {
+            // no one to shoot so res auto-win
+            this.finishGame(true);
+        }
+
+        const embed = new EmbedBuilder()
+        .setTitle(`Assassination`)
+        .setDescription(`Waiting for <@${ass}> to shoot`);
+
+        const row = new ActionRowBuilder<SelectMenuBuilder>()
+        .addComponents(
+            new SelectMenuBuilder()
+                .setCustomId('shoot')
+                .setPlaceholder(`Pick who to assassinate`)
+                .setMinValues(minass)
+                .setMaxValues(maxass)
+                .addOptions(
+                    Array.from(this.playOrder!.filter(x => !this.roleMap!.get(x)!.spy || this.roleMap!.get(x)!.ober), x => ({label: this._nameMap!.get(x)!, value: String(x)}))
+                )
+        )
+
+        this._thread?.send({ embeds: [embed], components: [row] }); 
+    }
+
+    endAss(uid: bigint, vals: string[]): null | boolean {
+        if(!this.roleMap!.get(uid)!.ass) return null;
+        if(vals.length == 1) {
+            // merl shot
+            return this.roleMap!.get(BigInt(vals[0]))!.merl;
+        }
+        else {
+            // lovers shot
+            return this.roleMap!.get(BigInt(vals[0]))!.lover && this.roleMap!.get(BigInt(vals[1]))!.lover;
+        }
+    }
+
+    finishGame(reswin: boolean): void {
+        let playerString = "";
+        for(let p of this.playOrder!) {
+            playerString += `<@${p}>: ${this.roleMap!.get(p)!.name}\n`;
+        }
+
+        const embed = new EmbedBuilder()
+		.setTitle(`The ${reswin ? 'Resistance' : 'Spies'} have won`)
+		.setDescription(playerString.slice(0,-1))
+		.setColor(reswin ? Colors.Green : Colors.Red);
+
+        this._thread?.send({ embeds: [embed] });
     }
 
     getRole(uid: bigint): string | undefined {
