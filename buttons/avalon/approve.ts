@@ -6,7 +6,7 @@ import { Avalon } from '../../classes/avalon';
 
 module.exports = {
 	name: 'approve',
-	async execute(interaction: ButtonInteraction) {
+	async execute(interaction: ButtonInteraction, apped = true) {
 		const gid = BigInt(interaction.guildId!);
 		const globby = GLOBBY.get(gid);
 		const lobbyID = globby.getFromThread(BigInt(interaction.channel!.id));
@@ -16,7 +16,7 @@ module.exports = {
 		}
 		const lobby = globby.get(lobbyID!)! as Avalon;
 
-		const result = lobby.voteMission(BigInt(interaction.user.id), true);
+		const result = lobby.voteMission(BigInt(interaction.user.id), apped);
 
 		if(result == 2) {
 			await interaction.reply({ content: "Sorry! You have already voted.", ephemeral: true });
@@ -35,8 +35,11 @@ module.exports = {
 				.addFields(
 					{ name: 'Waiting on votes from:', value: lobby.getNotVoted() },
 				);
+			await interaction.update({ embeds: [interaction.message.embeds[0], embed], components: [interaction.message.components[0]] });
+			/*
 			await interaction.message.edit({ embeds: [interaction.message.embeds[0], embed], components: [interaction.message.components[0]] });
 			await interaction.reply({ content: "Your vote was recorded.", ephemeral: true });
+			*/
 			return;
 		}
 
