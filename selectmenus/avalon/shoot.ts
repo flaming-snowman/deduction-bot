@@ -1,8 +1,6 @@
 import { GLOBBY } from '../../classes/globby';
 import { Avalon } from '../../classes/avalon';
-import { EmbedBuilder } from '@discordjs/builders';
-import { ActionRowBuilder, ButtonBuilder } from '@discordjs/builders';
-import { ActionRow, ButtonStyle, Colors, SelectMenuInteraction } from 'discord.js';
+import { Colors, EmbedBuilder, SelectMenuInteraction } from 'discord.js';
 
 module.exports = {
 	name: 'shoot',

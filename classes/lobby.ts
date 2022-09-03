@@ -1,4 +1,4 @@
-import { AnyThreadChannel, GuildDefaultMessageNotifications, GuildMember } from "discord.js";
+import { AnyThreadChannel, Colors, EmbedBuilder } from "discord.js";
 import { GLOBBY } from "./globby";
 
 export class Lobby {
@@ -39,6 +39,18 @@ export class Lobby {
         return this._name;
     }
 
+    host(): bigint {
+        return this._mem.values().next().value
+    }
+
+    list(): string {
+        let s = "";
+        for(const p of this._mem) {
+            s += `<@${p}>\n`;
+        }
+        return s.slice(0, -1);
+    }
+
     memberJoin(uid: bigint): boolean {
         //returns true if member added to lobby
         //returns false if member already in lobby
@@ -58,9 +70,8 @@ export class Lobby {
     }
 
     start(uid: bigint): number {
-        const host = this._mem.values().next().value;
+        const host = this.host();
         if(uid != host) {
-            console.log(uid, host);
             return 1;
         }
         this._started = true;
@@ -68,15 +79,31 @@ export class Lobby {
     }
 
     desc(): string {
-        return `Lobby ${this._id} created <t:${this._time}:R> has ${this._mem.size} members with host <@${this._mem.values().next().value}>.`;
+        return `Lobby ${this._id} created <t:${this._time}:R> has ${this._mem.size} members with host <@${this.host()}>.`;
+    }
+
+    getEmbed(): EmbedBuilder {
+        const embed = new EmbedBuilder()
+        .setTitle(`Lobby ${this.id} - ${this.name}`)
+        .addFields(
+            { name: 'Host', value: `<@${this.host()}>`, inline: true },
+            { name: 'Created', value: `<t:${this._time}:R>`, inline: true },
+            { name: 'Size', value: `${this._mem.size}`, inline: true },
+            { name: 'Members', value: this.list() },
+        )
+        .setColor(Colors.Yellow);
+
+        return embed;
     }
 
     setup(thread: AnyThreadChannel): void {
         this._thread = thread;
         GLOBBY.get(BigInt(thread.guildId)).updateThreadMap(BigInt(thread.id), this._id);
+        /*
         let mentionMembers = "";
         this._mem!.forEach(x => mentionMembers += `<@${x}>`);
-        //thread.send({ content: mentionMembers });
+        thread.send({ content: mentionMembers });
+        */
     }
 
     getRole(uid: bigint): string | undefined {

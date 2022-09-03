@@ -1,6 +1,5 @@
 // This is a lot of boilerplating I'm really sorry if you try to read this
-import { SelectMenuBuilder, TimestampStyles } from '@discordjs/builders';
-import { ActionRowBuilder, AnyThreadChannel, ButtonBuilder, ButtonStyle, Colors, EmbedBuilder, ThreadAutoArchiveDuration, ThreadMember } from 'discord.js';
+import { ActionRowBuilder, AnyThreadChannel, ButtonBuilder, ButtonStyle, Colors, EmbedBuilder, SelectMenuBuilder } from 'discord.js';
 import { Lobby } from './lobby'
 
 class Res

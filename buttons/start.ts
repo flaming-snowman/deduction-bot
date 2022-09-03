@@ -1,7 +1,5 @@
 import { GLOBBY } from '../classes/globby';
-import { EmbedBuilder } from '@discordjs/builders';
-import { ActionRowBuilder, ButtonBuilder } from '@discordjs/builders';
-import { ButtonInteraction, ButtonStyle, GuildMember, TextChannel } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, Colors, EmbedBuilder, TextChannel } from 'discord.js';
 
 module.exports = {
 	name: 'start',
@@ -16,7 +14,12 @@ module.exports = {
 		const lobby = globby.get(lobbyID!)!;
 		const response = lobby.start(BigInt(interaction.user.id));
 		if(response != 0) {
-			await interaction.reply({ content: 'Error: Lobby was unable to start', ephemeral: true });
+			if(response == 1) {
+				await interaction.reply({ content: 'Error: Only the host may start the lobby', ephemeral: true });
+			}
+			if(response == 2) {
+				await interaction.reply({ content: 'Error: Lobby does not meet the requirements to begin', ephemeral: true });
+			}
 			return;
 		}
 		const memberCollection = await interaction.guild?.members.fetch({ user: Array.from(lobby.mem, x => String(x)) });
@@ -34,10 +37,9 @@ module.exports = {
 			autoArchiveDuration: 60,
 		})
 
-		const embed = new EmbedBuilder()
-		.setTitle("Lobby started")
-		.setURL(thread.url)
-		.setDescription(lobby!.desc());
+		const embed = lobby.getEmbed().setURL(thread.url)
+		.setColor(Colors.Green)
+		.addFields({ name: 'Status', value: 'In Progress'});
 
 		const row = new ActionRowBuilder<ButtonBuilder>()
 		.addComponents(

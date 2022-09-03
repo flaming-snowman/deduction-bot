@@ -1,8 +1,5 @@
-import { SlashCommandBuilder, SlashCommandSubcommandBuilder } from '@discordjs/builders';
 import { GLOBBY } from '../classes/globby';
-import { EmbedBuilder } from '@discordjs/builders';
-import { ActionRowBuilder, ButtonBuilder } from '@discordjs/builders';
-import { ButtonStyle, ChatInputCommandInteraction } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, SlashCommandBuilder, SlashCommandSubcommandBuilder } from 'discord.js';
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -22,10 +19,8 @@ module.exports = {
 		} else {
 			lobbyID = globby.add(BigInt(interaction.user.id));
 		}
-		const lobby = globby.get(lobbyID);
-		const embed = new EmbedBuilder()
-			.setTitle("New Lobby Created")
-			.setDescription(lobby!.desc());    
+		const lobby = globby.get(lobbyID)!;
+		
 		const row = new ActionRowBuilder<ButtonBuilder>()
 			.addComponents(
 				new ButtonBuilder()
@@ -41,7 +36,7 @@ module.exports = {
 					.setLabel('Start')
 					.setStyle(ButtonStyle.Primary),
 			)
-		await interaction.reply({ embeds: [embed], components: [row], fetchReply: true })
+		await interaction.reply({ embeds: [lobby.getEmbed().addFields({ name: 'Status', value: 'Waiting' })], components: [row], fetchReply: true })
 				.then((msg) => globby.updateMsgMap(BigInt(msg.id), lobbyID));
 	},
 };
