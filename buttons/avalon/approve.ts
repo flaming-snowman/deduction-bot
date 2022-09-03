@@ -45,7 +45,7 @@ module.exports = {
 
 		if(result == 3) {
 			const embed = new EmbedBuilder()
-				.setTitle(`Mission ${lobby.votePass() ? "Approved" : "Rejected"}`)
+				.setTitle(`${lobby.isHammer() ? 'Hammer' : 'Mission'} ${lobby.votePass() ? "Approved" : "Rejected"}`)
 				.setDescription(interaction.message.embeds[1].description)
 				.addFields(
 					{ name: 'Vote results:', value: lobby.voteString() },

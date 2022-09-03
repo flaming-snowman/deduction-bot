@@ -1,5 +1,5 @@
 // This is a lot of boilerplating I'm really sorry if you try to read this
-import { SelectMenuBuilder } from '@discordjs/builders';
+import { SelectMenuBuilder, TimestampStyles } from '@discordjs/builders';
 import { ActionRowBuilder, AnyThreadChannel, ButtonBuilder, ButtonStyle, Colors, EmbedBuilder, ThreadAutoArchiveDuration, ThreadMember } from 'discord.js';
 import { Lobby } from './lobby'
 
@@ -253,6 +253,12 @@ export class Avalon extends Lobby
         this.subMission++;
         this.turn++;
 
+        if(this.subMission == 6) {
+            //hammer rejected
+            this.finishGame(false);
+            return;
+        }
+
         let playerString = "";
         for(let i = 0; i < gameSize; i++) {
             if(i == this.turn%gameSize) {
@@ -330,6 +336,10 @@ export class Avalon extends Lobby
 
     votePass(): boolean {
         return this.apps!.size*2 > this.gameSize!;
+    }
+
+    isHammer(): boolean {
+        return this.subMission == 5;
     }
 
     embarkMission(): void {
