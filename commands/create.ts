@@ -36,7 +36,7 @@ module.exports = {
 					.setLabel('Start')
 					.setStyle(ButtonStyle.Primary),
 			)
-		await interaction.reply({ embeds: [lobby.getEmbed().addFields({ name: 'Status', value: 'Waiting' })], components: [row], fetchReply: true })
-				.then((msg) => globby.updateMsgMap(BigInt(msg.id), lobbyID));
+		await interaction.reply({ embeds: [lobby.getEmbed('Standard')], components: [row], fetchReply: true })
+				.then((msg) => { globby.updateMsgMap(BigInt(msg.id), lobbyID); lobby.setMsg(msg) });
 	},
 };

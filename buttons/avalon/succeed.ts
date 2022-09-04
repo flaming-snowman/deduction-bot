@@ -30,7 +30,8 @@ module.exports = {
 			const embed = new EmbedBuilder(interaction.message.embeds[0].toJSON())
 				.setFields(
 					{ name: 'Waiting on votes from:', value: lobby.getEmbarkNotVoted() },
-				);
+				)
+				.setColor(lobby.mcolor);
 
 			await interaction.update({ embeds: [embed], components: [interaction.message.components[0]] });
 			/*
@@ -44,7 +45,8 @@ module.exports = {
 			const embed = new EmbedBuilder(interaction.message.embeds[0].toJSON())
 				.setFields(
 					{ name: 'Result', value: lobby.embarkResult() },
-				);
+				)
+				.setColor(lobby.mcolor);
 			await interaction.update({ embeds: [embed], components: [] });
 
 			lobby.embarkFinish();

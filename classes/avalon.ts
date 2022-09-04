@@ -194,11 +194,18 @@ export class Avalon extends Lobby
         [new Merl(), new Percy(), new Res(), new Res(), new Res(), new Morg(), new Ass(), new Spy(), new Ober()],
     ]
 
-    constructor(num: number, host: bigint) {
-        super(num, host);
-        this._name = "Avalon";
+    private _mcolor: number[] = [Colors.DarkGreen, Colors.DarkBlue, Colors.DarkRed, Colors.DarkGold, Colors.DarkOrange ]
+    public get mcolor(): number {
+        return this._mcolor[this.bigMission-1];
     }
 
+    constructor(num: number, host: bigint) {
+        super(num, host);
+        super.addStatus('Res Win', Colors.Green); // 3
+        super.addStatus('Spies Win', Colors.Red); // 4
+        this._name = "Avalon";
+    }
+    
     start(uid: bigint): number {
         this.gameSize = this._mem.size;
         if(this.gameSize < this.minSize || this.gameSize > this.maxSize) return 2;
@@ -231,7 +238,8 @@ export class Avalon extends Lobby
 
         const embed = new EmbedBuilder()
 		.setTitle("Lobby started")
-		.setDescription(this.desc());
+		.setDescription(this.desc())
+        .setColor(Colors.DarkPurple);
 
 		const row = new ActionRowBuilder<ButtonBuilder>()
 		.addComponents(
@@ -271,7 +279,8 @@ export class Avalon extends Lobby
         }
         const embed = new EmbedBuilder()
         .setTitle(`Mission ${this.bigMission}.${this.subMission}`)
-        .setDescription(playerString);
+        .setDescription(playerString)
+        .setColor(this.mcolor);
 
         const row = new ActionRowBuilder<SelectMenuBuilder>()
         .addComponents(
@@ -347,7 +356,8 @@ export class Avalon extends Lobby
         .setDescription(this.curMission!.list())
         .addFields(
             { name: 'Waiting on votes from:', value: this.curMission!.getNotVoted() },
-        );
+        )
+        .setColor(this.mcolor);
 
         const row = new ActionRowBuilder<ButtonBuilder>()
 		.addComponents(
@@ -423,7 +433,8 @@ export class Avalon extends Lobby
 
         const embed = new EmbedBuilder()
         .setTitle(`Assassination`)
-        .setDescription(`Waiting for <@${ass}> to shoot`);
+        .setDescription(`Waiting for <@${ass}> to shoot`)
+        .setColor(Colors.DarkVividPink);
 
         const row = new ActionRowBuilder<SelectMenuBuilder>()
         .addComponents(
@@ -464,6 +475,9 @@ export class Avalon extends Lobby
 		.setColor(reswin ? Colors.Green : Colors.Red);
 
         this._thread?.send({ embeds: [embed] });
+
+        super.setStatus(reswin ? 3 : 4);
+        super.updateEmbed(super.getEmbed('Standard'));
     }
 
     getRole(uid: bigint): string | undefined {

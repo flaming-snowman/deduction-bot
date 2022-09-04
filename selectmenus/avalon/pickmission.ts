@@ -26,7 +26,8 @@ module.exports = {
 		.setDescription(result)
 		.addFields(
 			{ name: 'Waiting on votes from:', value: lobby.getNotVoted() },
-		);
+		)
+		.setColor(lobby.mcolor);
 
 		const row = new ActionRowBuilder<ButtonBuilder>()
 		.addComponents(

@@ -27,18 +27,12 @@ module.exports = {
 			}
 			if(lobby.mem.size == 0) {
 				globby.del(lobbyID);
-				const embed = new EmbedBuilder()
-				.setTitle(`Lobby ${lobby.id} - ${lobby.name}`)
-				.setFields(
-					{ name: 'Status', value: 'Abandoned' }
-				)
-				.setColor(Colors.Red);
 
-				await interaction.update({ embeds: [embed], components: [] });
+				await interaction.update({ embeds: [lobby.getEmbed('Abandoned')], components: [] });
 				return;
 			}
 		}
 
-		await interaction.update({ embeds: [lobby.getEmbed().addFields({ name: 'Status', value: 'Waiting' })] });
+		await interaction.update({ embeds: [lobby.getEmbed('Standard')] });
 	},
 };

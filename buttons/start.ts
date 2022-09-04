@@ -1,5 +1,5 @@
 import { GLOBBY } from '../classes/globby';
-import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, Colors, EmbedBuilder, TextChannel } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, TextChannel } from 'discord.js';
 
 module.exports = {
 	name: 'start',
@@ -37,9 +37,8 @@ module.exports = {
 			autoArchiveDuration: 60,
 		})
 
-		const embed = lobby.getEmbed().setURL(thread.url)
-		.setColor(Colors.Green)
-		.addFields({ name: 'Status', value: 'In Progress'});
+		lobby.setStatus(1);
+		const embed = lobby.getEmbed('Standard').setURL(thread.url);
 
 		const row = new ActionRowBuilder<ButtonBuilder>()
 		.addComponents(

@@ -32,7 +32,8 @@ module.exports = {
 				.setDescription(interaction.message.embeds[1].description)
 				.addFields(
 					{ name: 'Waiting on votes from:', value: lobby.getNotVoted() },
-				);
+				)
+				.setColor(lobby.mcolor);
 			await interaction.update({ embeds: [interaction.message.embeds[0], embed], components: [interaction.message.components[0]] });
 			/*
 			await interaction.message.edit({ embeds: [interaction.message.embeds[0], embed], components: [interaction.message.components[0]] });
@@ -47,7 +48,8 @@ module.exports = {
 				.setDescription(interaction.message.embeds[1].description)
 				.addFields(
 					{ name: 'Vote results:', value: lobby.voteString() },
-				);
+				)
+				.setColor(lobby.mcolor);
 			await interaction.update({ embeds: [interaction.message.embeds[0], embed], components: [] });
 			
 			if(lobby.votePass()) lobby.embarkMission();

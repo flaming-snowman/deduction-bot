@@ -29,7 +29,7 @@ module.exports = {
 		const embed = new EmbedBuilder()
 		.setTitle(`Assassination ${correct ? 'Successful' : 'Failed'}`)
 		.setDescription(shot)
-		.setColor(correct ? Colors.Green : Colors.Red);
+		.setColor(Colors.DarkVividPink);
 
 		await interaction.update({ embeds: [embed], components: [] });
 		
