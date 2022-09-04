@@ -4,6 +4,6 @@ module.exports = {
 	name: 'reject',
 	async execute(interaction: ButtonInteraction) {
 		// @ts-ignore
-		interaction.client.buttons.get('approve').execute(interaction, false);
+		interaction.client.user_actions.get('approve').execute(interaction, false);
 	},
 };

@@ -7,7 +7,7 @@ module.exports = {
 		.setName('lobbies')
 		.setDescription('Display the list of lobbies'),
 	async execute(interaction: any) {
-		const gid = interaction.guild.id;
+		const gid = BigInt(interaction.guildId!);
 		if(!GLOBBY.has(gid)) {
 			GLOBBY.add(gid);
 		}

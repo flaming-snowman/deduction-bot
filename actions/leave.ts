@@ -4,6 +4,6 @@ module.exports = {
 	name: 'leave',
 	async execute(interaction: ButtonInteraction) {
 		// @ts-ignore
-		interaction.client.buttons.get('join').execute(interaction, false);
+		interaction.client.user_actions.get('join').execute(interaction, false);
 	},
 };

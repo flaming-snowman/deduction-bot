@@ -15,6 +15,9 @@ class guildLobby {
     }
     
     list(): string {
+        if(this.lobbies.size == 0) {
+            return "There are no active lobbies";
+        }
         let s: string = "";
         for(let value of this.lobbies.values()) {
             s += value.desc() + '\n';

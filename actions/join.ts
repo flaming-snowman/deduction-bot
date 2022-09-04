@@ -26,9 +26,8 @@ module.exports = {
 				return;
 			}
 			if(lobby.mem.size == 0) {
-				globby.del(lobbyID);
-
 				await interaction.update({ embeds: [lobby.getEmbed('Abandoned')], components: [] });
+				globby.del(lobbyID);
 				return;
 			}
 		}
