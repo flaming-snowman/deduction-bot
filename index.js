@@ -24,30 +24,17 @@ for (const file of commandFiles) {
 	commands.push(command.data.toJSON());
 }
 
-// Retrieve buttons
-client.buttons = new Collection();
-const buttonFiles = fs.readdirSync('./buttons').filter(file => file.endsWith('.js'));
-const buttonDirs = fs.readdirSync('./buttons').filter(dir => fs.statSync(`./buttons/${dir}`).isDirectory());
-for (const dir of buttonDirs) {
-	let files = fs.readdirSync(`./buttons/${dir}`).filter(file => file.endsWith('.js'));
-	files.forEach(x => buttonFiles.push(`${dir}/${x}`));
+// Retrieve actions (buttons, select menus, text input)
+client.user_actions = new Collection();
+const actionFiles = fs.readdirSync('./actions').filter(file => file.endsWith('.js'));
+const actionDirs = fs.readdirSync('./actions').filter(dir => fs.statSync(`./actions/${dir}`).isDirectory());
+for (const dir of actionDirs) {
+	let files = fs.readdirSync(`./actions/${dir}`).filter(file => file.endsWith('.js'));
+	files.forEach(x => actionFiles.push(`${dir}/${x}`));
 }
-for (const file of buttonFiles) {
-	const button = require(`./buttons/${file}`);
-	client.buttons.set(button.name, button);
-}
-
-// Retrieve buttons
-client.selectmenus = new Collection();
-const selectmenuFiles = fs.readdirSync('./selectmenus').filter(file => file.endsWith('.js'));
-const selectmenuDirs = fs.readdirSync('./selectmenus').filter(dir => fs.statSync(`./selectmenus/${dir}`).isDirectory());
-for (const dir of selectmenuDirs) {
-	let files = fs.readdirSync(`./selectmenus/${dir}`).filter(file => file.endsWith('.js'));
-	files.forEach(x => selectmenuFiles.push(`${dir}/${x}`));
-}
-for (const file of selectmenuFiles) {
-	const selectmenu = require(`./selectmenus/${file}`);
-	client.selectmenus.set(selectmenu.name, selectmenu);
+for (const file of actionFiles) {
+	const action = require(`./actions/${file}`);
+	client.user_actions.set(action.name, action);
 }
 
 // Register commands in dev guild

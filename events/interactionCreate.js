@@ -18,7 +18,7 @@ module.exports = {
 			}
 		}
 		if (interaction.isButton()) {
-			const button = interaction.client.buttons.get(interaction.customId);
+			const button = interaction.client.user_actions.get(interaction.customId);
 			console.log(`${interaction.user.tag} in #${interaction.channel.name} used button '${interaction.customId}'.`);
 
 			if (!button) {
@@ -34,7 +34,7 @@ module.exports = {
 			}
 		}
 		if (interaction.isSelectMenu()) {
-			const smenu = interaction.client.selectmenus.get(interaction.customId);
+			const smenu = interaction.client.user_actions.get(interaction.customId);
 			console.log(`${interaction.user.tag} in #${interaction.channel.name} used select menu '${interaction.customId}'.`);
 
 			if (!smenu) {
