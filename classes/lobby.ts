@@ -142,8 +142,12 @@ export class Lobby {
         return new EmbedBuilder();
     }
 
-    updateEmbed(embed: EmbedBuilder): void {
-        this._msg!.edit({ embeds: [embed], components: [] });
+    updateEmbed(embed: EmbedBuilder, rmembeds: boolean = true): void {
+        if(rmembeds) {
+            this._msg?.edit({ embeds: [embed], components: [] });
+        } else {
+            this._msg?.edit({ embeds: [embed] });
+        }
     }
 
     setup(thread: AnyThreadChannel): void {

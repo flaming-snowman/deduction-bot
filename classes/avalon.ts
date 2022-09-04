@@ -63,41 +63,37 @@ class Spy extends Res
     }
 }
 
-class Ass extends Res
+class Ass extends Spy
 {
     constructor() {
         super();
-        this.spy = true;
         this.ass = true;
         this.name = "Assassin";
     }
 }
 
-class Morg extends Res
+class Morg extends Spy
 {
     constructor() {
         super();
-        this.spy = true;
         this.morg = true;
         this.name = "Morgana";
     }
 }
 
-class Mord extends Res
+class Mord extends Spy
 {
     constructor() {
         super();
-        this.spy = true;
         this.mord = true;
         this.name = "Mordred";
     }
 }
 
-class Ober extends Res
+class Ober extends Spy
 {
     constructor() {
         super();
-        this.spy = true;
         this.ober = true;
         this.name = "Oberon";
     }
@@ -182,18 +178,9 @@ export class Avalon extends Lobby
         [3,4,4,5,5],
         [3,4,4,5,5],
     ]
-    private rsetup: Res[][] =
-    [
-        [new Res()],
-        [new Merl(), new Ass()],
-        [new Merl(), new Percy(), new Res(), new Morg(), new Ass()],
-        [new Merl(), new Percy(), new Res(), new Res(), new Morg(), new Ass()],
-        [new Merl(), new Percy(), new Res(), new Res(), new Morg(), new Ass(), new Ober()],
-        [new Merl(), new Percy(), new Res(), new Res(), new Res(), new Morg(), new Ass(), new Spy()],
-        [new Merl(), new Percy(), new Res(), new Res(), new Res(), new Morg(), new Ass(), new Mord()],
-        [new Merl(), new Percy(), new Res(), new Res(), new Res(), new Morg(), new Ass(), new Spy(), new Ober()],
-    ]
-
+    private spycount: number[] = [1,1,2,2,3,3,3,4];
+    private rsetup: Res[] = [];
+    private rconfig: string[] = ["Merlin", "Percival", "Morgana", "Assassin"];
     private _mcolor: number[] = [Colors.DarkGreen, Colors.DarkBlue, Colors.DarkRed, Colors.DarkGold, Colors.DarkOrange ]
     public get mcolor(): number {
         return this._mcolor[this.bigMission-1];
@@ -205,10 +192,80 @@ export class Avalon extends Lobby
         super.addStatus('Spies Win', Colors.Red); // 4
         this._name = "Avalon";
     }
+
+    config(uid: bigint, values: string[]): boolean {
+        if(uid != this.host()) {
+            return false;
+        }
+        this.rconfig = values;
+
+        return true;
+    }
     
+    assign(): boolean {
+        let res = 0;
+        let spies = 0;
+        const targetspy = this.spycount[this.gameSize! - this.minSize];
+        const targetres = this.gameSize! - targetspy;
+        this.rsetup = [];
+        for(let role of this.rconfig) {
+            switch(role) {
+                case "Merlin": {
+                    res++;
+                    this.rsetup.push(new Merl());
+                    break;
+                }
+                case "Percival": {
+                    res++;
+                    this.rsetup.push(new Percy());
+                    break;
+                }
+                case "Tristan": {
+                    res++;
+                    this.rsetup.push(new Tristan());
+                    break;
+                }
+                case "Isolde": {
+                    res++;
+                    this.rsetup.push(new Isolde());
+                    break;
+                }
+                case "Morgana": {
+                    spies++;
+                    this.rsetup.push(new Morg());
+                    break;
+                }
+                case "Mordred": {
+                    spies++;
+                    this.rsetup.push(new Mord());
+                    break;
+                }
+                case "Assassin": {
+                    spies++;
+                    this.rsetup.push(new Ass());
+                    break;
+                }
+                case "Oberon": {
+                    spies++;
+                    this.rsetup.push(new Ober());
+                    break;
+                }
+            }
+        }
+        if(res > targetres || spies > targetspy) return false;
+        for(let i = 0; i < targetres-res; i++) {
+            this.rsetup.push(new Res());
+        }
+        for(let i = 0; i < targetspy-spies; i++) {
+            this.rsetup.push(new Spy());
+        }
+        return true;
+    }
+
     start(uid: bigint): number {
         this.gameSize = this._mem.size;
         if(this.gameSize < this.minSize || this.gameSize > this.maxSize) return 2;
+        if(!this.assign()) return 3;
         if(super.start(uid) == 1) return 1;
 
         return 0;
@@ -226,7 +283,7 @@ export class Avalon extends Lobby
     setup(thread: AnyThreadChannel): void {
         super.setup(thread);
         //shuffle and assign roles
-        let roles = this.rsetup[this.gameSize!-this.minSize];
+        let roles = this.rsetup;
         this.shuf(roles);
         roles.forEach(x => console.log(x.name));
         this.roleMap = new Map<bigint, Res>();
@@ -477,10 +534,42 @@ export class Avalon extends Lobby
         this._thread?.send({ embeds: [embed] });
 
         super.setStatus(reswin ? 3 : 4);
-        super.updateEmbed(super.getEmbed('Standard'));
+
+        const uembed = super.getEmbed('Standard').setFields(
+            { name: 'Host', value: `<@${this.host()}>`, inline: true },
+                { name: 'Created', value: `<t:${this.time}:R>`, inline: true },
+                { name: 'Size', value: `${this._mem.size}`, inline: true },
+                { name: 'Members', value: playerString.slice(0,-1) },
+                { name: 'Status', value: this.getStatus()},
+        )
+        super.updateEmbed(uembed);
     }
 
     getRole(uid: bigint): string | undefined {
         return this.roleMap?.get(uid)?.name;
+    }
+
+    getEmbed(type: 'Standard' | 'Abandoned'): EmbedBuilder {
+        if(type == 'Abandoned') {
+            return super.getEmbed(type);
+        }
+        if(type == 'Standard') {
+            let s = "";
+            this.rconfig.forEach(x => s += x + ', ');
+            const embed = new EmbedBuilder()
+            .setTitle(`Lobby ${this.id} - ${this.name}`)
+            .addFields(
+                { name: 'Host', value: `<@${this.host()}>`, inline: true },
+                { name: 'Created', value: `<t:${this.time}:R>`, inline: true },
+                { name: 'Size', value: `${this.mem.size}`, inline: true },
+                { name: 'Members', value: this.list() },
+                { name: 'Roles', value: s.slice(0,-2)},
+                { name: 'Status', value: this.getStatus()},
+            )
+            .setColor(this.getColor());
+            return embed;
+        }
+        // TypeScript is stupid and thinks this code is necessary and reachable
+        return new EmbedBuilder();
     }
 }
