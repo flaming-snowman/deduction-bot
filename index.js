@@ -2,7 +2,7 @@
 const fs = require('node:fs');
 const { Client, Collection, GatewayIntentBits, Routes } = require('discord.js');
 const { REST } = require('@discordjs/rest');
-const { clientId, guildId, token } = require('./config.json');
+const { clientId, token } = require('./config.json');
 
 // Create a new client instance
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
@@ -44,11 +44,11 @@ const rest = new REST({ version: '10' }).setToken(token);
 		console.log('Started refreshing application (/) commands.');
 
 		await rest.put(
-			Routes.applicationGuildCommands(clientId, guildId),
+			Routes.applicationCommands(clientId),
 			{ body: commands },
 		);
 
-		console.log('Successfully reloaded application (/) commands.');
+		console.log('Successfully reloaded application (/) commands. It may take some time for global commands to refresh.');
 	}
 	catch (error) {
 		console.error(error);

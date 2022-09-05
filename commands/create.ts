@@ -1,5 +1,5 @@
 import { GLOBBY } from '../classes/globby';
-import { ActionRow, ActionRowBuilder, ActionRowData, AnyComponentBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, SelectMenuBuilder, SlashCommandBuilder, SlashCommandSubcommandBuilder } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, SelectMenuBuilder, SlashCommandBuilder, SlashCommandSubcommandBuilder } from 'discord.js';
 
 module.exports = {
 	data: new SlashCommandBuilder()

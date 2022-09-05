@@ -1,6 +1,6 @@
 node_modules
-.env
 config.json
+devconf.json
 commands/**/*.js
 classes/**/*.js
 actions/**/*.js

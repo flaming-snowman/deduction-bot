@@ -5,7 +5,8 @@ import { EmbedBuilder } from '@discordjs/builders';
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('lobbies')
-		.setDescription('Display the list of lobbies'),
+		.setDescription('Display the list of lobbies')
+		.setDMPermission(false),
 	async execute(interaction: any) {
 		const gid = BigInt(interaction.guildId!);
 		if(!GLOBBY.has(gid)) {

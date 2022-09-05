@@ -486,6 +486,7 @@ export class Avalon extends Lobby
         else if(!merl) {
             // no one to shoot so res auto-win
             this.finishGame(true);
+            return;
         }
 
         const embed = new EmbedBuilder()
