@@ -154,7 +154,7 @@ class Mission
 
 export class Avalon extends Lobby
 {
-    private minSize = 1;
+    private minSize = 5;
     private maxSize = 10;
     private gameSize?: number;
     private roleMap?: Map<bigint, Res>;
@@ -169,8 +169,6 @@ export class Avalon extends Lobby
     private notVoted?: Set<bigint>;
     private msetup: number[][] =
     [
-        [1,1,1,1,1],
-        [1,1,1,1,1],
         [2,3,2,3,3],
         [2,3,4,3,4],
         [2,3,3,4,4],
@@ -178,7 +176,7 @@ export class Avalon extends Lobby
         [3,4,4,5,5],
         [3,4,4,5,5],
     ]
-    private spycount: number[] = [1,1,2,2,3,3,3,4];
+    private spycount: number[] = [2,2,3,3,3,4];
     private rsetup: Res[] = [];
     private rconfig: string[] = ["Merlin", "Percival", "Morgana", "Assassin"];
     private _mcolor: number[] = [Colors.DarkGreen, Colors.DarkBlue, Colors.DarkRed, Colors.DarkGold, Colors.DarkOrange ]
