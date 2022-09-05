@@ -8,19 +8,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/flaming-snowman/social-bot.git"
+    "url": "git+https://github.com/flaming-snowman/deduction-bot.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/flaming-snowman/social-bot/issues"
+    "url": "https://github.com/flaming-snowman/deduction-bot/issues"
   },
-  "homepage": "https://github.com/flaming-snowman/social-bot#readme",
+  "homepage": "https://github.com/flaming-snowman/deduction-bot#readme",
   "dependencies": {
-    "@discordjs/builders": "1.0.0",
-    "@discordjs/rest": "1.0.1",
-    "discord-api-types": "0.36.3",
     "discord.js": "14.0.3",
     "dotenv": "16.0.1"
   },
