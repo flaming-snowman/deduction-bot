@@ -25,6 +25,10 @@ module.exports = {
 			}
 			return;
 		}
+		if(!(interaction.channel! as TextChannel).viewable) {
+			await interaction.reply({ content: 'Error: Bot must have the `View Channel` permission to start the lobby', ephemeral: true });
+			return;
+		}
 		const memberCollection = await interaction.guild?.members.fetch({ user: Array.from(lobby.mem, x => String(x)) });
 		if(!memberCollection) {
 			throw new Error("One or more users not found");
@@ -38,7 +42,9 @@ module.exports = {
 		const thread = await (interaction.channel as TextChannel).threads.create({
 			name: `Lobby ${lobbyID} - ${lobby.name}`,
 			autoArchiveDuration: 60,
-		})
+		}).catch(error => console.log('Bot does not have permission to create threads'));
+
+		if(!thread) return;
 
 		lobby.setStatus(1);
 		const embed = lobby.getEmbed('Standard').setURL(thread.url);

@@ -302,7 +302,7 @@ export class Avalon extends Lobby
 				.setLabel('Get Role')
 				.setStyle(ButtonStyle.Primary)
 		);
-        thread.send({ embeds: [embed], components: [row] });
+        thread.send({ embeds: [embed], components: [row] }).catch(error => console.error('Permissions were revoked midgame'));
 
         this.nextMission();
     }
@@ -347,7 +347,7 @@ export class Avalon extends Lobby
                     Array.from(this.playOrder!, (x, i) => ({label: this._nameMap!.get(x)!, value: String(i)}))
                 )
         )
-        this._thread?.send({ embeds: [embed], components: [row] });
+        this._thread?.send({ embeds: [embed], components: [row] }).catch(error => console.error('Permissions were revoked midgame'));
     }
 
     pickMission(uid: bigint, selected: string[]): string | null {
@@ -425,7 +425,7 @@ export class Avalon extends Lobby
 			.setStyle(ButtonStyle.Danger)
 		);
 
-        this._thread?.send({ embeds: [embed], components: [row] });
+        this._thread?.send({ embeds: [embed], components: [row] }).catch(error => console.error('Permissions were revoked midgame'));
     }
 
     voteEmbark(uid: bigint, failed: boolean): number {
@@ -503,7 +503,7 @@ export class Avalon extends Lobby
                 )
         )
 
-        this._thread?.send({ embeds: [embed], components: [row] }); 
+        this._thread?.send({ embeds: [embed], components: [row] }).catch(error => console.error('Permissions were revoked midgame')); 
     }
 
     endAss(uid: bigint, vals: string[]): null | boolean {
@@ -529,7 +529,7 @@ export class Avalon extends Lobby
 		.setDescription(playerString.slice(0,-1))
 		.setColor(reswin ? Colors.Green : Colors.Red);
 
-        this._thread?.send({ embeds: [embed] });
+        this._thread?.send({ embeds: [embed] }).catch(error => console.error('Permissions were revoked midgame'));
 
         super.setStatus(reswin ? 3 : 4);
 

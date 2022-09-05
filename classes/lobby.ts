@@ -144,9 +144,9 @@ export class Lobby {
 
     updateEmbed(embed: EmbedBuilder, rmembeds: boolean = true): void {
         if(rmembeds) {
-            this._msg?.edit({ embeds: [embed], components: [] });
+            this._msg!.edit({ embeds: [embed], components: [] }).catch(error => console.error('Lobby deleted - cannot edit'));
         } else {
-            this._msg?.edit({ embeds: [embed] });
+            this._msg!.edit({ embeds: [embed] }).catch(error => console.error('Lobby deleted - cannot edit'));
         }
     }
 

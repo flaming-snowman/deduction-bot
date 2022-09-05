@@ -1,5 +1,5 @@
 import { GLOBBY } from '../classes/globby';
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, SelectMenuBuilder, SlashCommandBuilder, SlashCommandSubcommandBuilder } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType, ChatInputCommandInteraction, GuildTextBasedChannel, SelectMenuBuilder, SlashCommandBuilder, SlashCommandSubcommandBuilder, TextChannel } from 'discord.js';
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -11,6 +11,11 @@ module.exports = {
 		.setDescription('Create an Avalon lobby')
 		),
 	async execute(interaction: ChatInputCommandInteraction) {
+		if(interaction.channel!.type != ChannelType.GuildText) {
+			await interaction.reply({ content: 'Sorry! Lobbies can only be created in normal text channels', ephemeral: true });
+			return;
+		}
+
 		const gid = BigInt(interaction.guildId!);
 		const globby = GLOBBY.get(gid);
 		let lobbyID: number;
