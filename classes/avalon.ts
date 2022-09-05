@@ -283,7 +283,6 @@ export class Avalon extends Lobby
         //shuffle and assign roles
         let roles = this.rsetup;
         this.shuf(roles);
-        roles.forEach(x => console.log(x.name));
         this.roleMap = new Map<bigint, Res>();
         this.playOrder = Array.from(this._mem);
         for(let i = 0; i < roles.length; i++) {
