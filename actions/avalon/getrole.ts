@@ -1,5 +1,6 @@
 import { GLOBBY } from '../../classes/globby';
 import { ButtonInteraction, EmbedBuilder } from 'discord.js';
+import { Avalon } from '../../classes/avalon';
 
 module.exports = {
 	name: 'getrole',
@@ -11,9 +12,11 @@ module.exports = {
 			await interaction.reply({ content: 'Error: Lobby has expired', ephemeral: true });
 			return;
 		}
-		const lobby = globby.get(lobbyID!)!;
+		const lobby = globby.get(lobbyID!)! as Avalon;
+		const uid = BigInt(interaction.user.id);
 		const embed = new EmbedBuilder()
-			.setTitle(`Your role: ${lobby.getRole(BigInt(interaction.user.id))}`)
+			.setTitle(`Your role: ${lobby.getRole(uid)}`)
+			.setDescription(lobby.getRoleDesc(uid));
 		await interaction.reply({ embeds: [embed], ephemeral: true });
 	},
 };

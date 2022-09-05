@@ -545,8 +545,63 @@ export class Avalon extends Lobby
         super.updateEmbed(uembed);
     }
 
-    getRole(uid: bigint): string | undefined {
-        return this.roleMap?.get(uid)?.name;
+    getRole(uid: bigint): string {
+        return this.roleMap!.get(uid)!.name;
+    }
+
+    getRoleDesc(uid: bigint): string {
+        const role = this.getRole(uid);
+        switch(role) {
+            case 'Resistance':
+            case 'Oberon': {
+                return "No special information is known to you";
+            }
+            case 'Merlin': {
+                let s = "Spies known: ";
+                for(let x of this.playOrder!) {
+                    const player = this.roleMap!.get(x)!;
+                    if(player.spy && !player.mord) {
+                        s += `<@${x}>, `;
+                    }
+                }
+                return s.slice(0, -2);
+            }
+            case 'Percival': {
+                let s = "Potential Merlins: ";
+                for(let x of this.playOrder!) {
+                    const player = this.roleMap!.get(x)!;
+                    if(player.merl || player.morg) {
+                        s += `<@${x}>, `;
+                    }
+                }
+                return s.slice(0, -2);
+            }
+            case 'Tristan':
+            case 'Isolde': {
+                let s = "Lovers: ";
+                for(let x of this.playOrder!) {
+                    const player = this.roleMap!.get(x)!;
+                    if(player.lover) {
+                        s += `<@${x}>, `;
+                    }
+                }
+                return s.slice(0, -2);
+            }
+            case 'Spy':
+            case 'Assassin':
+            case 'Morgana':
+            case 'Mordred': {
+                let s = "Spies known: ";
+                for(let x of this.playOrder!) {
+                    const player = this.roleMap!.get(x)!;
+                    if(player.spy && !player.ober) {
+                        s += `<@${x}>, `;
+                    }
+                }
+                return s.slice(0, -2);
+            }
+        }
+        return "Bug: please notify the developer";
     }
 
     getEmbed(type: 'Standard' | 'Abandoned'): EmbedBuilder {
