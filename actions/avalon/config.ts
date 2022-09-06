@@ -1,6 +1,6 @@
 import { GLOBBY } from '../../classes/globby';
 import { Avalon } from '../../classes/avalon';
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, SelectMenuInteraction } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, SelectMenuBuilder, SelectMenuInteraction } from 'discord.js';
 
 module.exports = {
 	name: 'avaconfig',
@@ -21,6 +21,24 @@ module.exports = {
 			return;
 		}
 		
-		await interaction.update({ embeds: [lobby.getEmbed('Standard')] });
+		const configrow = new ActionRowBuilder<SelectMenuBuilder>().addComponents(
+			new SelectMenuBuilder()
+				.setCustomId('avaconfig')
+				.setPlaceholder(`Configure special roles`)
+				.setMinValues(0)
+				.setMaxValues(8)
+				.addOptions(
+					{label: 'Merlin', value: 'Merlin', default: interaction.values.indexOf('Merlin') > -1 },
+					{label: 'Percival', value: 'Percival', default: interaction.values.indexOf('Percival') > -1 },
+					{label: 'Morgana', value: 'Morgana', default: interaction.values.indexOf('Morgana') > -1 },
+					{label: 'Assassin', value: 'Assassin', default: interaction.values.indexOf('Assassin') > -1 },
+					{label: 'Mordred', value: 'Mordred', default: interaction.values.indexOf('Mordred') > -1 },
+					{label: 'Oberon', value: 'Oberon', default: interaction.values.indexOf('Oberon') > -1 },
+					{label: 'Tristan', value: 'Tristan', default: interaction.values.indexOf('Tristan') > -1 },
+					{label: 'Isolde', value: 'Isolde', default: interaction.values.indexOf('Isolde') > -1 },
+				)
+		);
+
+		await interaction.update({ embeds: [lobby.getEmbed('Standard')], components: [interaction.message.components[0], configrow] });
 	},
 };
