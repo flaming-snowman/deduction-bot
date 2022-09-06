@@ -462,6 +462,7 @@ export class Avalon extends Lobby
         }
         this.bigMission++;
         this.subMission = 0;
+        this.hammer = this.turn+5;
         this.nextMission();
     }
 
