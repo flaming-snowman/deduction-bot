@@ -617,7 +617,7 @@ export class Avalon extends Lobby
                 { name: 'Created', value: `<t:${this.time}:R>`, inline: true },
                 { name: 'Size', value: `${this.mem.size}`, inline: true },
                 { name: 'Members', value: this.list() },
-                { name: 'Roles', value: s.slice(0,-2)},
+                { name: 'Roles', value: s == "" ? 'None' : s.slice(0,-2)},
                 { name: 'Status', value: this.getStatus()},
             )
             .setColor(this.getColor());
