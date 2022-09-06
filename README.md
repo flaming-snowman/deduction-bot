@@ -37,6 +37,8 @@ If the bot crashes at any point and goes offline, please notify me with what ste
 # compiling and running locally
 cmd+shift+B to compile in VSCode
 
+node_modules/.bin/tsc -p tsconfig.json to compile in terminal
+
 config.json supplies clientId and token
 
 `node index.js` to run in terminal
