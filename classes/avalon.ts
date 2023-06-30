@@ -1,5 +1,5 @@
 // This is a lot of boilerplating I'm really sorry if you try to read this
-import { ActionRowBuilder, AnyThreadChannel, ButtonBuilder, ButtonStyle, Colors, EmbedBuilder, SelectMenuBuilder } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Colors, EmbedBuilder, StringSelectMenuBuilder, ThreadChannel } from 'discord.js';
 import { Lobby } from './lobby'
 
 class Res
@@ -278,7 +278,7 @@ export class Avalon extends Lobby
         }
     }
 
-    setup(thread: AnyThreadChannel): void {
+    setup(thread: ThreadChannel): void {
         super.setup(thread);
         //shuffle and assign roles
         let roles = this.rsetup;
@@ -336,9 +336,9 @@ export class Avalon extends Lobby
         .setDescription(playerString)
         .setColor(this.mcolor);
 
-        const row = new ActionRowBuilder<SelectMenuBuilder>()
+        const row = new ActionRowBuilder<StringSelectMenuBuilder>()
         .addComponents(
-            new SelectMenuBuilder()
+            new StringSelectMenuBuilder()
                 .setCustomId('pickmission')
                 .setPlaceholder(`Select ${missionSize} players`)
                 .setMinValues(missionSize)
@@ -492,9 +492,9 @@ export class Avalon extends Lobby
         .setDescription(`Waiting for <@${ass}> to shoot`)
         .setColor(Colors.DarkVividPink);
 
-        const row = new ActionRowBuilder<SelectMenuBuilder>()
+        const row = new ActionRowBuilder<StringSelectMenuBuilder>()
         .addComponents(
-            new SelectMenuBuilder()
+            new StringSelectMenuBuilder()
                 .setCustomId('shoot')
                 .setPlaceholder(`Pick who to assassinate`)
                 .setMinValues(minass)

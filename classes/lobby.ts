@@ -1,4 +1,4 @@
-import { AnyThreadChannel, Colors, EmbedBuilder, Message } from "discord.js";
+import { ThreadChannel, Colors, EmbedBuilder, Message } from "discord.js";
 import { GLOBBY } from "./globby";
 
 export class Lobby {
@@ -12,7 +12,7 @@ export class Lobby {
     private _statuscolor: number[] = [Colors.Yellow, Colors.Orange, Colors.Green];
     private _msg?: Message;
     protected _name: string = "NOT IMPLEMENTED";
-    protected _thread?: AnyThreadChannel;
+    protected _thread?: ThreadChannel;
     protected _nameMap?: Map<bigint, string>;
 
     constructor(num: number, host: bigint) {
@@ -150,7 +150,7 @@ export class Lobby {
         }
     }
 
-    setup(thread: AnyThreadChannel): void {
+    setup(thread: ThreadChannel): void {
         this._thread = thread;
         GLOBBY.get(BigInt(thread.guildId)).updateThreadMap(BigInt(thread.id), this._id);
         /*

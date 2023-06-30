@@ -1,10 +1,10 @@
 import { GLOBBY } from '../../classes/globby';
 import { Avalon } from '../../classes/avalon';
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, SelectMenuBuilder, SelectMenuInteraction } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, StringSelectMenuBuilder, StringSelectMenuInteraction } from 'discord.js';
 
 module.exports = {
 	name: 'avaconfig',
-	async execute(interaction: SelectMenuInteraction) {
+	async execute(interaction: StringSelectMenuInteraction) {
 		const gid = BigInt(interaction.guildId!);
 		const globby = GLOBBY.get(gid);
 		const lobbyID = globby.getFromMsg(BigInt(interaction.message.id));
@@ -21,8 +21,8 @@ module.exports = {
 			return;
 		}
 		
-		const configrow = new ActionRowBuilder<SelectMenuBuilder>().addComponents(
-			new SelectMenuBuilder()
+		const configrow = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+			new StringSelectMenuBuilder()
 				.setCustomId('avaconfig')
 				.setPlaceholder(`Configure special roles`)
 				.setMinValues(0)

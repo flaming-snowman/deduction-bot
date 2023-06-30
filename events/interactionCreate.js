@@ -33,7 +33,7 @@ module.exports = {
 				await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
 			}
 		}
-		if (interaction.isSelectMenu()) {
+		if (interaction.isStringSelectMenu()) {
 			const smenu = interaction.client.user_actions.get(interaction.customId);
 			console.log(`${interaction.user.tag} in #${interaction.channel.name} used select menu '${interaction.customId}'.`);
 

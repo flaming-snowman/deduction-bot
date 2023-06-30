@@ -1,10 +1,10 @@
 import { GLOBBY } from '../../classes/globby';
 import { Avalon } from '../../classes/avalon';
-import { Colors, EmbedBuilder, SelectMenuInteraction } from 'discord.js';
+import { Colors, EmbedBuilder, StringSelectMenuInteraction } from 'discord.js';
 
 module.exports = {
 	name: 'shoot',
-	async execute(interaction: SelectMenuInteraction) {
+	async execute(interaction: StringSelectMenuInteraction) {
 		const gid = BigInt(interaction.guildId!);
 		const globby = GLOBBY.get(gid);
 		const lobbyID = globby.getFromThread(BigInt(interaction.channel!.id));

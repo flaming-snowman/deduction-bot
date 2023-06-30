@@ -1,5 +1,5 @@
 import { GLOBBY } from '../classes/globby';
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType, ChatInputCommandInteraction, GuildTextBasedChannel, SelectMenuBuilder, SlashCommandBuilder, SlashCommandSubcommandBuilder, TextChannel } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType, ChatInputCommandInteraction, GuildTextBasedChannel, StringSelectMenuBuilder, SlashCommandBuilder, SlashCommandSubcommandBuilder, TextChannel } from 'discord.js';
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -36,11 +36,11 @@ module.exports = {
 				.setStyle(ButtonStyle.Primary),
 		);
 		// ActionRowBuilder<AnyComponentBuilder> doesn't work due to some cursed inheritance shenanigans
-		let rows: ActionRowBuilder<ButtonBuilder | SelectMenuBuilder>[] = [joinrow];
+		let rows: ActionRowBuilder<ButtonBuilder | StringSelectMenuBuilder>[] = [joinrow];
 		if(interaction.options.getSubcommand() == 'avalon') {
 			lobbyID = globby.addAvalon(BigInt(interaction.user.id));
-			const configrow = new ActionRowBuilder<SelectMenuBuilder>().addComponents(
-				new SelectMenuBuilder()
+			const configrow = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+				new StringSelectMenuBuilder()
 					.setCustomId('avaconfig')
 					.setPlaceholder(`Configure special roles`)
 					.setMinValues(0)
