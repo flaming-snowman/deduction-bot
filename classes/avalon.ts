@@ -1,6 +1,8 @@
 // This is a lot of boilerplating I'm really sorry if you try to read this
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Colors, EmbedBuilder, StringSelectMenuBuilder, ThreadChannel } from 'discord.js';
 import { Lobby } from './lobby'
+import { Response } from './response';
+import { Utils } from './utils';
 
 class Res
 {
@@ -260,35 +262,24 @@ export class Avalon extends Lobby
         return true;
     }
 
-    start(uid: bigint): number {
+    start(uid: bigint): Response {
         this.gameSize = this._mem.size;
-        if(this.gameSize < this.minSize || this.gameSize > this.maxSize) return 2;
-        if(!this.assign()) return 3;
-        if(super.start(uid) == 1) return 1;
-
-        return 0;
-    }
-
-    shuf(arr: any[]): void {
-        let curr = arr.length, rand: number;
-        while(curr > 1) {
-            rand = Math.floor(Math.random() * curr);
-            curr--;
-            [arr[curr], arr[rand]] = [arr[rand], arr[curr]];
-        }
+        if(this.gameSize < this.minSize || this.gameSize > this.maxSize) return new Response(1, `Error: ${this.name} only supports lobby sizes of ${this.minSize}-${this.maxSize}`);
+        if(!this.assign()) return new Response(1, 'Error: You have too many special res or spy roles');
+        return super.start(uid);
     }
 
     setup(thread: ThreadChannel): void {
         super.setup(thread);
         //shuffle and assign roles
         let roles = this.rsetup;
-        this.shuf(roles);
+        Utils.shuf(roles);
         this.roleMap = new Map<bigint, Res>();
         this.playOrder = Array.from(this._mem);
         for(let i = 0; i < roles.length; i++) {
             this.roleMap.set(this.playOrder[i], roles[i]);
         }
-        this.shuf(this.playOrder);
+        Utils.shuf(this.playOrder);
 
         const embed = new EmbedBuilder()
 		.setTitle("Lobby started")

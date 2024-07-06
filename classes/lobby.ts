@@ -1,12 +1,13 @@
 import { ThreadChannel, Colors, EmbedBuilder, Message } from "discord.js";
 import { GLOBBY } from "./globby";
+import { Response } from "./response";
 
 export class Lobby {
     // uids for each user in the lobby
     protected _mem: Set<bigint>; // list of members
     private _time: number;
     private _started: boolean;
-    private _id: number;
+    private readonly _id: number;
     private _status: number;
     private _statusname: string[] = ['Waiting', 'In Progress', 'Concluded'];
     private _statuscolor: number[] = [Colors.Yellow, Colors.Orange, Colors.Green];
@@ -82,13 +83,13 @@ export class Lobby {
         this._nameMap = members;
     }
 
-    start(uid: bigint): number {
+    start(uid: bigint): Response {
         const host = this.host();
         if(uid != host) {
-            return 1;
+            return new Response(1, 'Error: Only the host can start the lobby');
         }
         this._started = true;
-        return 0;
+        return new Response(0, 'Success');
     }
 
     desc(): string {

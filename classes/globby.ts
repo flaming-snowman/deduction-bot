@@ -1,5 +1,6 @@
 import { Lobby } from './lobby'
 import { Avalon } from './avalon'
+import { Rotate } from './rotate'
 
 class guildLobby {
     private lobbies: Map<number, Lobby>; // map of lobby id: lobby object
@@ -41,6 +42,12 @@ class guildLobby {
 
     addAvalon(host: bigint): number {
         this.lobbies.set(this.nextID, new Avalon(this.nextID, host));
+        this.nextID++;
+        return this.nextID-1;
+    }
+
+    addRotate(host: bigint): number {
+        this.lobbies.set(this.nextID, new Rotate(this.nextID, host));
         this.nextID++;
         return this.nextID-1;
     }

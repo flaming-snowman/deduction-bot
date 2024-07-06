@@ -1,5 +1,5 @@
 import { GLOBBY } from '../classes/globby';
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType, ChatInputCommandInteraction, GuildTextBasedChannel, StringSelectMenuBuilder, SlashCommandBuilder, SlashCommandSubcommandBuilder, TextChannel } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType, ChatInputCommandInteraction, GuildTextBasedChannel, StringSelectMenuBuilder, SlashCommandBuilder, SlashCommandSubcommandBuilder, TextChannel, ModalBuilder } from 'discord.js';
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -7,8 +7,12 @@ module.exports = {
 		.setDescription('Create a new lobby')
 		.setDMPermission(false)
 		.addSubcommand(new SlashCommandSubcommandBuilder()
-		.setName('avalon')
-		.setDescription('Create an Avalon lobby')
+			.setName('avalon')
+			.setDescription('Create an Avalon lobby')
+		)
+		.addSubcommand(new SlashCommandSubcommandBuilder()
+			.setName('rotate')
+			.setDescription('Create a Rotate lobby')
 		),
 	async execute(interaction: ChatInputCommandInteraction) {
 		if(interaction.channel!.type != ChannelType.GuildText) {
@@ -37,28 +41,52 @@ module.exports = {
 		);
 		// ActionRowBuilder<AnyComponentBuilder> doesn't work due to some cursed inheritance shenanigans
 		let rows: ActionRowBuilder<ButtonBuilder | StringSelectMenuBuilder>[] = [joinrow];
-		if(interaction.options.getSubcommand() == 'avalon') {
-			lobbyID = globby.addAvalon(BigInt(interaction.user.id));
-			const configrow = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
-				new StringSelectMenuBuilder()
-					.setCustomId('avaconfig')
+		switch(interaction.options.getSubcommand()) {
+			case 'avalon':
+				lobbyID = globby.addAvalon(BigInt(interaction.user.id));
+				const configrow = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+					new StringSelectMenuBuilder()
+						.setCustomId('avaconfig')
+						.setPlaceholder(`Configure special roles`)
+						.setMinValues(0)
+						.setMaxValues(8)
+						.addOptions(
+							{label: 'Merlin', value: 'Merlin', default: true},
+							{label: 'Percival', value: 'Percival', default: true},
+							{label: 'Morgana', value: 'Morgana', default: true},
+							{label: 'Assassin', value: 'Assassin', default: true},
+							{label: 'Mordred', value: 'Mordred', default: false},
+							{label: 'Oberon', value: 'Oberon', default: false},
+							{label: 'Tristan', value: 'Tristan', default: false},
+							{label: 'Isolde', value: 'Isolde', default: false},
+						)
+				);
+				rows.push(configrow);
+				break;
+			case 'rotate':
+				rows[0].addComponents(new ButtonBuilder()
+					.setCustomId('rot_edit')
+					.setLabel('Edit')
+					.setStyle(ButtonStyle.Secondary)
+				)
+				lobbyID = globby.addRotate(BigInt(interaction.user.id));
+				const rotrow = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+					new StringSelectMenuBuilder()
+					.setCustomId('rot_roles')
 					.setPlaceholder(`Configure special roles`)
 					.setMinValues(0)
-					.setMaxValues(8)
+					.setMaxValues(4)
 					.addOptions(
-						{label: 'Merlin', value: 'Merlin', default: true},
-						{label: 'Percival', value: 'Percival', default: true},
-						{label: 'Morgana', value: 'Morgana', default: true},
-						{label: 'Assassin', value: 'Assassin', default: true},
-						{label: 'Mordred', value: 'Mordred', default: false},
-						{label: 'Oberon', value: 'Oberon', default: false},
-						{label: 'Tristan', value: 'Tristan', default: false},
-						{label: 'Isolde', value: 'Isolde', default: false},
+						{label: 'Invest', value: 'Invest', default: true },
+						{label: 'Mimic', value: 'Mimic', default: true },
+						{label: 'Warden', value: 'Warden', default: true },
+						{label: 'Assassin', value: 'Assassin', default: true },
 					)
-			);
-			rows.push(configrow);
-		} else {
-			lobbyID = globby.add(BigInt(interaction.user.id));
+				);
+				rows.push(rotrow);
+				break;
+			default:
+				lobbyID = globby.add(BigInt(interaction.user.id));
 		}
 		const lobby = globby.get(lobbyID)!;
 		

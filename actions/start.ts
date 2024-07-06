@@ -13,16 +13,8 @@ module.exports = {
 		}
 		const lobby = globby.get(lobbyID!)!;
 		const response = lobby.start(BigInt(interaction.user.id));
-		if(response != 0) {
-			if(response == 1) {
-				await interaction.reply({ content: 'Error: Only the host may start the lobby', ephemeral: true });
-			}
-			if(response == 2) {
-				await interaction.reply({ content: 'Error: Avalon only supports lobby sizes of 5-10', ephemeral: true });
-			}
-			if(response == 3) {
-				await interaction.reply({ content: 'Error: You have too many special res or spy roles', ephemeral: true });
-			}
+		if(response.code != 0) {
+			await interaction.reply({ content: response.message, ephemeral: true });
 			return;
 		}
 		if(!(interaction.channel! as TextChannel).viewable) {

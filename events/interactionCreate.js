@@ -17,32 +17,16 @@ module.exports = {
 				await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
 			}
 		}
-		if (interaction.isButton()) {
-			const button = interaction.client.user_actions.get(interaction.customId);
-			console.log(`${interaction.user.tag} in #${interaction.channel.name} used button '${interaction.customId}'.`);
+		else {
+			const action = interaction.client.user_actions.get(interaction.customId);
+			console.log(`${interaction.user.tag} in #${interaction.channel.name} used action '${interaction.customId}'.`);
 
-			if (!button) {
+			if (!action) {
 				console.error(`No interaction handler for '${interaction.customId}'`);
 				return;
 			};
 			try {
-				await button.execute(interaction);
-			}
-			catch (error) {
-				console.error(error);
-				await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
-			}
-		}
-		if (interaction.isStringSelectMenu()) {
-			const smenu = interaction.client.user_actions.get(interaction.customId);
-			console.log(`${interaction.user.tag} in #${interaction.channel.name} used select menu '${interaction.customId}'.`);
-
-			if (!smenu) {
-				console.error(`No interaction handler for '${interaction.customId}'`);
-				return;
-			};
-			try {
-				await smenu.execute(interaction);
+				await action.execute(interaction);
 			}
 			catch (error) {
 				console.error(error);
