@@ -7,7 +7,7 @@ module.exports = {
 		if(!interaction.isFromMessage()) return;
 		const gid = BigInt(interaction.guildId!);
 		const mid = BigInt(interaction.message.id);
-		const lobby = Helper.getLobby(gid, mid);
+		const lobby = Helper.getLobbyFromMsg(gid, mid);
 		if(lobby === null) {
 			await interaction.reply({ content: 'Error: Lobby has expired', ephemeral: true });
 			return;

@@ -77,10 +77,11 @@ module.exports = {
 					.setMinValues(0)
 					.setMaxValues(4)
 					.addOptions(
-						{label: 'Invest', value: 'Invest', default: true },
-						{label: 'Mimic', value: 'Mimic', default: true },
-						{label: 'Warden', value: 'Warden', default: true },
-						{label: 'Assassin', value: 'Assassin', default: true },
+						{label: 'Invest', value: 'Invest', default: false },
+						{label: 'Mimic', value: 'Mimic', default: false },
+						{label: 'Warden', value: 'Warden', default: false },
+						{label: 'Assassin', value: 'Assassin', default: false },
+						{label: 'Mastermind', value: 'Mastermind', default: true },
 					)
 				);
 				rows.push(rotrow);

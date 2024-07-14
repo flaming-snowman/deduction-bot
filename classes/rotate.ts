@@ -2,6 +2,7 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Colors, EmbedBuilder, StringSelectMenuBuilder, ThreadChannel } from 'discord.js';
 import { Lobby } from './lobby'
 import { Response } from './response'
+import { Utils } from './utils'
 
 enum Role {
     // Vanilla Roles
@@ -11,10 +12,12 @@ enum Role {
     // Power Good
     Invest = "Invest",
     Warden = "Warden",
+    Hero = "Hero",
 
     // Power Evil
     Assassin = "Assassin",
     Mimic = "Mimic",
+    Mastermind = "Mastermind",
 }
 
 class Config {
@@ -29,10 +32,12 @@ class Config {
     numRounds: number = 2;
     gameSize: number = 0;
     powerRoles: Set<Role>;
+    roles: Array<Role>;
 
     constructor (host: bigint) {
         this.host = host;
-        this.powerRoles = new Set<Role>([Role.Invest, Role.Warden, Role.Assassin, Role.Mimic]);
+        this.powerRoles = new Set<Role>([Role.Mastermind]);
+        this.roles = [];
     }
 
     verifyHost(uid: bigint): boolean {
@@ -42,15 +47,114 @@ class Config {
     displayString(): string {
         return `Evils: ${this.evils}\nBalls Each: ${this.ballsEach}\nEvil Balls: ${this.evilBalls}\nEvil Win Condition: ${this.evilWinCon}\nNumber of Rounds: ${this.numRounds}`;
     }
+
+    initRoles(gameSize: number): Response {
+        if(gameSize > this.maxSize || gameSize < this.minSize) {
+            return { code: 1, message: `Error: Rotate supports only lobbies of size ${this.minSize} to ${this.maxSize}`};
+        }
+        this.roles = [];
+        const targetEvil = this.evils;
+        const targetGood = gameSize - this.evils;
+        let evilCount = 0;
+        let goodCount = 0;
+        this.powerRoles.forEach(role => {
+            this.roles.push(role);
+            if(Config.isEvil(role)) evilCount++;
+            else goodCount++;
+        });
+        console.log(evilCount, goodCount, targetEvil, targetGood)
+        if(evilCount > targetEvil || goodCount > targetGood) {
+            return { code: 1, message: "Error: Too many power roles for the number of players" };
+        }
+
+        // Push vanilla town roles for remaining good players
+        const remainingGood = targetGood - goodCount;
+        for (let i = 0; i < remainingGood; i++) {
+            this.roles.push(Role.Town);
+        }
+        
+        // Push vanilla evil roles for remaining evil players
+        const remainingEvil = targetEvil - evilCount;
+        for (let i = 0; i < remainingEvil; i++) {
+            this.roles.push(Role.Evil);
+        }
+
+        this.gameSize = gameSize;
+
+        return { code: 0, message: "Success" };
+    }
+
+    static isEvil(role: Role): boolean {
+        return [Role.Evil, Role.Assassin, Role.Mimic, Role.Mastermind].includes(role);
+    }
 }
 
-export class Rotate extends Lobby
-{
+class Game {
     private roleMap: Map<bigint, Role> = new Map<bigint, Role>();
     private playOrder: bigint[] = [];
     private turn = -1;
     private notVoted: Set<bigint> = new Set<bigint>();
+    private evilString: string = "";
+
+    getRole(uid: bigint): string {
+        const role = this.roleMap.get(uid);
+        if(!role) return "Spectator";
+        return role;
+    }
+
+    getRoleDesc(uid: bigint): string {
+        const role = this.getRole(uid);
+        switch(role) {
+            case "Spectator": {
+                return "You are a spectator. You are not part of the game.";
+            }
+            case Role.Town: {
+                return "You are good. You have no special ability";
+            }
+            case Role.Hero: {
+                return "You are the hero. For each evil player you select, good gains an additional point.";
+            }
+            case Role.Evil: {
+                return `You are evil. You have no special ability.\n${this.evilString}`;
+            }
+            case Role.Mastermind: {
+                return `You are the mastermind. At the end of the game, you choose the hero.\n${this.evilString}`;
+            }
+        }
+        return "NOT IMPLEMENTED";
+    }
+
+    init(roles: Role[], members: Set<bigint>): void {
+        Utils.shuf(roles);
+        this.roleMap = new Map<bigint, Role>();
+        this.playOrder = Array.from(members);
+        for(let i = 0; i < roles.length; i++) {
+            this.roleMap.set(this.playOrder[i], roles[i]);
+        }
+        Utils.shuf(this.playOrder);
+
+        //store string of evil players
+        this.evilString = "Evil players: ";
+        for(let x of this.playOrder) {
+            const player = this.roleMap.get(x)!;
+            if(Config.isEvil(player)) this.evilString += `<@${x}>, `;
+        }
+        this.evilString = this.evilString.slice(0, -2);
+    }
+
+    playerString(): string {
+        let playerString = "";
+        for(let p of this.playOrder) {
+            playerString += `<@${p}>: ${this.roleMap.get(p)!}\n`;
+        }
+        return playerString;
+    }
+}
+
+export class Rotate extends Lobby
+{
     rconfig: Config;
+    game: Game = new Game();
 
     constructor(num: number, host: bigint) {
         super(num, host);
@@ -60,11 +164,9 @@ export class Rotate extends Lobby
         this._name = "Rotate";
     }
 
-    roleConfig(uid: bigint, roles: string[]): Response {
-        if(!this.rconfig.verifyHost(uid)) return {code: 1, message: "Error: Only the host may change lobby settings"};
+    roleConfig(roles: string[]): void {
         this.rconfig.powerRoles.clear();
         roles.forEach(role => {this.rconfig.powerRoles.add(Role[role as keyof typeof Role])});
-        return {code: 0, message: "Success"};
     }
 
     settingConfig(settings: number[]): Response {
@@ -97,5 +199,52 @@ export class Rotate extends Lobby
                 .setColor(this.getColor());
                 return embed;
         }
+    }
+
+    start(uid: bigint): Response {
+        const response = this.rconfig.initRoles(this._mem.size);
+        if(response.code != 0) return response;
+        return super.start(uid);
+    }
+
+    setup(thread: ThreadChannel): void {
+        super.setup(thread);
+        //shuffle and assign roles
+        this.game.init(this.rconfig.roles, this._mem);
+
+        const embed = new EmbedBuilder()
+		.setTitle("Lobby started")
+		.setDescription(this.desc())
+        .setColor(Colors.DarkPurple);
+
+		const row = new ActionRowBuilder<ButtonBuilder>()
+		.addComponents(
+			new ButtonBuilder()
+				.setCustomId('rot_getrole')
+				.setLabel('Get Role')
+				.setStyle(ButtonStyle.Primary)
+		);
+        thread.send({ embeds: [embed], components: [row] }).catch(error => console.error('Permissions were revoked midgame'));
+    }
+
+    finishGame(reswin: boolean): void {
+        const playerString = this.game.playerString();
+        const embed = new EmbedBuilder()
+		.setTitle(`${reswin ? 'Good' : 'Evil'} has won`)
+		.setDescription(playerString.slice(0,-1))
+		.setColor(reswin ? Colors.Green : Colors.Red);
+
+        this._thread?.send({ embeds: [embed] }).catch(error => console.error('Permissions were revoked midgame'));
+
+        super.setStatus(reswin ? 3 : 4);
+
+        const uembed = super.getEmbed('Standard').setFields(
+            { name: 'Host', value: `<@${this.host()}>`, inline: true },
+                { name: 'Created', value: `<t:${this.time}:R>`, inline: true },
+                { name: 'Size', value: `${this._mem.size}`, inline: true },
+                { name: 'Members', value: playerString.slice(0,-1) },
+                { name: 'Status', value: this.getStatus()},
+        )
+        super.updateEmbed(uembed);
     }
 }

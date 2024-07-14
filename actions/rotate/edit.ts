@@ -6,7 +6,7 @@ module.exports = {
 	async execute(interaction: ButtonInteraction) {
 		const gid = BigInt(interaction.guildId!);
 		const mid = BigInt(interaction.message.id);
-		const lobby = Helper.getLobby(gid, mid);
+		const lobby = Helper.getLobbyFromMsg(gid, mid);
 		if(lobby === null) {
 			await interaction.reply({ content: 'Error: Lobby has expired', ephemeral: true });
 			return;
@@ -14,6 +14,7 @@ module.exports = {
 
         if(!lobby.rconfig.verifyHost(BigInt(interaction.user.id))) {
             await interaction.reply({ content: 'Error: Only the host can edit the lobby', ephemeral: true });
+            return;
         }
         
         const modal = new ModalBuilder().setCustomId('rot_setup')

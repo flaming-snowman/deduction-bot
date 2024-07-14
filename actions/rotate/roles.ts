@@ -6,17 +6,18 @@ module.exports = {
 	async execute(interaction: StringSelectMenuInteraction) {
 		const gid = BigInt(interaction.guildId!);
 		const mid = BigInt(interaction.message.id);
-		const lobby = Helper.getLobby(gid, mid);
+		const lobby = Helper.getLobbyFromMsg(gid, mid);
 		if(lobby === null) {
 			await interaction.reply({ content: 'Error: Lobby has expired', ephemeral: true });
 			return;
 		}
 
-		const result = lobby.roleConfig(BigInt(interaction.user.id), interaction.values);
-		if(result.code != 0) {
-			await interaction.reply({ content: result.message, ephemeral: true });
-			return;
-		}
+		if(!lobby.rconfig.verifyHost(BigInt(interaction.user.id))) {
+            await interaction.reply({ content: 'Error: Only the host can edit the lobby', ephemeral: true });
+            return;
+        }
+
+		lobby.roleConfig(interaction.values);
 		
 		const configrow = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
 			new StringSelectMenuBuilder()
